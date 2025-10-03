@@ -72,9 +72,18 @@ export function HRMSSidebar() {
       className={`${collapsed ? "w-16" : "w-64"} border-r bg-gradient-to-b from-card via-card/90 to-card/80 backdrop-blur-sm shadow-elevated transition-smooth`}
       collapsible="icon"
     >
-      <div className="flex h-16 items-center justify-between px-4 border-b border-border/50 bg-gradient-primary/5">
+            <div className="flex h-16 items-center justify-between px-4 border-b border-border/50 bg-gradient-primary/5">
         {!collapsed && (
-          <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">Glob HRMS</h1>
+          <div className="flex items-center space-x-2">
+            <img
+              src="https://globtechnoitsolution.com:8443/ec-admin-dev-ui/assets/images/logo.png"
+              alt="GlobTechno Logo"
+              className="h-8 w-auto" // Adjusts image height to fit nicely in 64px header
+            />
+            <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              Glob HRMS
+            </h1>
+          </div>
         )}
         <SidebarTrigger className="ml-auto hover:bg-accent/50 transition-colors" />
       </div>
