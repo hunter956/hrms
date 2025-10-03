@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* HRMS Design System - Navy Blue Professional Theme */
+
+@layer base {
+  :root {
+    /* Navy Blue Focused Background */
+    --background: 216 20% 95%; /* Light Navy Tint #F8F9FB */
+    --foreground: 216 87% 15%; /* Deep Navy #0A1B3D */
+
+    --card: 216 50% 98%; /* Very Light Navy Tint */
+    --card-foreground: 216 87% 15%;
+
+    --popover: 216 50% 98%;
+    --popover-foreground: 216 87% 15%;
+
+    /* Navy Blue Primary Palette */
+    --primary: 216 87% 25%; /* Deep Navy #072A5C */
+    --primary-foreground: 255 255 255;
+    --primary-hover: 216 87% 20%;
+    --primary-muted: 216 50% 96%;
+
+    /* Lighter Navy Secondary */
+    --secondary: 216 60% 45%; /* Medium Navy #3D5A8C */
+    --secondary-foreground: 255 255 255;
+
+    --muted: 216 30% 92%;
+    --muted-foreground: 216 50% 35%;
+
+    /* Gold Accent for Contrast */
+    --accent: 45 100% 55%; /* Professional Gold #FFB000 */
+    --accent-foreground: 216 87% 15%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 255 255 255;
+
+    --border: 216 30% 88%;
+    --input: 216 30% 88%;
+    --ring: 216 87% 25%;
+
+    --radius: 0.75rem;
+
+    /* HRMS Specific Variables */
+    --hrms-success: 142 76% 36%;
+    --hrms-success-foreground: 255 255 255;
+    --hrms-warning: 45 100% 55%;
+    --hrms-warning-foreground: 216 87% 15%;
+    --hrms-info: 216 60% 45%;
+    --hrms-info-foreground: 255 255 255;
+
+    /* Navy Blue Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(216 87% 25%), hsl(216 87% 20%));
+    --gradient-secondary: linear-gradient(135deg, hsl(216 60% 45%), hsl(216 60% 40%));
+    --gradient-card: linear-gradient(135deg, hsl(216 50% 98%), hsl(216 30% 95%));
+    --gradient-background: linear-gradient(135deg, hsl(216 20% 95%), hsl(216 30% 90%));
+    --gradient-accent: linear-gradient(135deg, hsl(45 100% 55%), hsl(45 100% 50%));
+
+    /* Navy Themed Shadows */
+    --shadow-card: 0 1px 3px 0 hsl(216 87% 15% / 0.1), 0 1px 2px 0 hsl(216 87% 15% / 0.06);
+    --shadow-elevated: 0 10px 15px -3px hsl(216 87% 15% / 0.15), 0 4px 6px -2px hsl(216 87% 15% / 0.1);
+    --shadow-primary: 0 10px 30px -10px hsl(216 87% 25% / 0.4);
+    --shadow-navy-glow: 0 0 40px hsl(216 87% 25% / 0.2);
+
+    /* Smooth Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s ease-out;
+
+    /* Navy Sidebar Colors */
+    --sidebar-background: 216 50% 98%;
+    --sidebar-foreground: 216 87% 15%;
+    --sidebar-primary: 216 87% 25%;
+    --sidebar-primary-foreground: 255 255 255;
+    --sidebar-accent: 216 40% 94%;
+    --sidebar-accent-foreground: 216 87% 15%;
+    --sidebar-border: 216 30% 88%;
+    --sidebar-ring: 216 87% 25%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
