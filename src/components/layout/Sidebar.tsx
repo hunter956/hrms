@@ -74,16 +74,16 @@ export function HRMSSidebar() {
     >
       <div className="flex h-16 items-center justify-between px-4 border-b border-border/50 bg-gradient-primary/5">
         {!collapsed && (
-          <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">HRMS Pro</h1>
+          <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">Glob HRMS</h1>
         )}
         <SidebarTrigger className="ml-auto hover:bg-accent/50 transition-colors" />
       </div>
 
       <SidebarContent className="py-4">
         <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>
+          {/* <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>
             Core Modules
-          </SidebarGroupLabel>
+          </SidebarGroupLabel> */}
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {navigationItems.map((item) => (
