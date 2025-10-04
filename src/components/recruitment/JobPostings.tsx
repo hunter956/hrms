@@ -82,9 +82,9 @@ export function JobPostings() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-primary hover:bg-primary-hover">
-              <Plus className="h-4 w-4 mr-2" />
-              Post New Job
+            <Button className="bg-[#2563eb] hover:bg-[#215bda] text-white">
+                <Plus className="h-4 w-4 mr-2" />
+                    Post New Job
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">

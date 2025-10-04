@@ -94,7 +94,7 @@ export function OfferLetters() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-primary hover:bg-primary-hover">
+            <Button className="bg-[#2563eb] hover:bg-[#215bda] text-white">
               <Plus className="h-4 w-4 mr-2" />
               Generate Offer Letter
             </Button>

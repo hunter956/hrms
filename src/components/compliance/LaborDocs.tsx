@@ -59,7 +59,7 @@ export default function LaborDocs() {
             </div>
             <div className="flex items-center justify-end gap-2">
               <Button type="reset" variant="outline" onClick={() => setForm({ title: "", category: categories[0], effectiveFrom: "", file: undefined })}>Clear</Button>
-              <Button type="submit">Add Document</Button>
+              <Button type="submit"  className="px-6 py-3 h-auto">Add Document</Button>
             </div>
           </form>
         </CardContent>

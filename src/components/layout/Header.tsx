@@ -37,7 +37,7 @@ export function Header() {
           title="Open Notifications"
         >
           <Bell className="h-5 w-5" />
-          <Badge  className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-xs bg-yellow-400 text-black flex items-center justify-center">3</Badge>
+          <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-xs bg-[#0ea5e9] text-white flex items-center justify-center hover:bg-[#0b7cb1]/90 transition-colors">3</Badge>
         </Button>
 
         {/* User Profile */}
@@ -46,7 +46,7 @@ export function Header() {
             <Button variant="ghost" className="flex items-center gap-2 p-2 hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]">
               <Avatar className="h-8 w-8 ring-2 ring-primary/20 transition-all hover:ring-primary/40">
                 <AvatarImage src="/avatars/admin.jpg" alt="Admin" />
-                <AvatarFallback className="bg-gradient-primary text-primary-foreground font-semibold">
+                <AvatarFallback className="bg-[#2563eb] text-white font-semibold">
                   AD
                 </AvatarFallback>
               </Avatar>

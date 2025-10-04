@@ -80,7 +80,7 @@ export function GoalsKPIs() {
             <Target className="h-5 w-5 text-primary" />
             Goals & KPIs
           </CardTitle>
-          <Button onClick={() => setShowForm(!showForm)}>
+          <Button onClick={() => setShowForm(!showForm)}  className="px-6 py-3 h-auto">
             <Plus className="h-4 w-4 mr-2" />
             Add Goal
           </Button>

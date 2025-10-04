@@ -72,17 +72,17 @@ export function EmployeeTable() {
   const [employees] = useState<Employee[]>(sampleEmployees);
 
   const getStatusColor = (status: Employee["status"]) => {
-    switch (status) {
-      case "Active":
-        return "bg-hrms-success text-hrms-success-foreground";
-      case "On Leave":
-        return "bg-hrms-warning text-hrms-warning-foreground";
-      case "Inactive":
-        return "bg-destructive text-destructive-foreground";
-      default:
-        return "bg-muted text-muted-foreground";
-    }
-  };
+  switch (status) {
+    case "Active":
+      return "bg-hrms-success text-white";
+    case "On Leave":
+      return "bg-hrms-warning text-white";
+    case "Inactive":
+      return "bg-destructive text-white";
+    default:
+      return "bg-muted text-white";
+  }
+};
 
   const getInitials = (name: string) => {
     return name

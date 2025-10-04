@@ -138,7 +138,7 @@ export default function SalaryStructure() {
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => { setEditingId(null); form.reset(); }}>
+              <Button onClick={() => { setEditingId(null); form.reset(); }}  className="px-6 py-3 h-auto">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Structure
               </Button>

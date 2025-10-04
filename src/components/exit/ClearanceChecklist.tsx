@@ -61,7 +61,7 @@ export default function ClearanceChecklist() {
             </div>
             <div className="flex items-center justify-end gap-2">
               <Button type="reset" variant="outline" onClick={() => setForm({ employee: "", itAssets: false, documents: false, duesCleared: false, remarks: "" })}>Clear</Button>
-              <Button type="submit">Add</Button>
+              <Button type="submit"  className="px-6 py-3 h-auto">Add</Button>
             </div>
           </form>
         </CardContent>
