@@ -19,17 +19,17 @@ export default function Employees() {
     <div className="space-y-8 animate-fade-in">
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <div className="relative">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold text-[#1e293b]">
             Employee Management
           </h1>
-          <p className="text-muted-foreground mt-3 text-lg">
+          <p className="text-[#64748b] mt-3 text-lg">
             Manage your workforce and employee information
           </p>
-          <div className="absolute -top-2 -left-2 w-12 h-12 bg-gradient-primary/10 rounded-full blur-xl"></div>
+          <div className="absolute -top-2 -left-2 w-12 h-12 bg-[#0ea5e9]/20 rounded-full blur-xl"></div>
         </div>
         <Button 
           onClick={() => window.location.href = '/employees/add'}
-          className="bg-gradient-primary shadow-primary hover:shadow-elevated hover:scale-105 transition-all duration-300 px-6 py-3 h-auto"
+          className="px-6 py-3 h-auto"
         >
           <Plus className="mr-2 h-5 w-5" />
           Add Employee
@@ -37,7 +37,7 @@ export default function Employees() {
       </div>
 
       {/* Filters and Search */}
-      <div className="flex flex-col sm:flex-row gap-4 bg-gradient-card p-6 rounded-xl shadow-elevated border border-border/50">
+      <div className="flex flex-col sm:flex-row gap-4 bg-[#f9fafb] p-6 rounded-xl shadow-elevated border border-[#e2e8f0]">
         <div className="flex-1">
           <Input
             placeholder="Search employees by name, email, or ID..."
@@ -59,11 +59,11 @@ export default function Employees() {
             <SelectItem value="finance">Finance</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant="outline" className="flex items-center gap-2 hover:bg-accent/50 hover:scale-105 transition-all duration-300">
+        <Button variant="outline" className="flex items-center gap-2">
           <Filter className="h-4 w-4" />
           More Filters
         </Button>
-        <Button variant="outline" className="flex items-center gap-2 hover:bg-accent/50 hover:scale-105 transition-all duration-300">
+        <Button variant="outline" className="flex items-center gap-2">
           <Download className="h-4 w-4" />
           Export
         </Button>
@@ -74,21 +74,21 @@ export default function Employees() {
 
       {/* Employee Stats Footer */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
-        <div className="bg-gradient-card p-6 rounded-xl shadow-elevated text-center border border-border/50 hover:scale-105 transition-all duration-300 hover:shadow-primary/5">
-          <div className="text-3xl font-bold text-primary mb-2">1,248</div>
-          <div className="text-sm text-muted-foreground">Total Employees</div>
+        <div className="bg-[#f9fafb] p-6 rounded-xl shadow-elevated text-center border border-[#e2e8f0] hover:scale-105 transition-all duration-300 hover:shadow-lg">
+          <div className="text-3xl font-bold text-[#2563eb] mb-2">1,248</div>
+          <div className="text-sm text-[#64748b]">Total Employees</div>
         </div>
-        <div className="bg-gradient-card p-6 rounded-xl shadow-elevated text-center border border-border/50 hover:scale-105 transition-all duration-300 hover:shadow-hrms-success/5">
+        <div className="bg-[#f9fafb] p-6 rounded-xl shadow-elevated text-center border border-[#e2e8f0] hover:scale-105 transition-all duration-300 hover:shadow-lg">
           <div className="text-3xl font-bold text-hrms-success mb-2">1,195</div>
-          <div className="text-sm text-muted-foreground">Active</div>
+          <div className="text-sm text-[#64748b]">Active</div>
         </div>
-        <div className="bg-gradient-card p-6 rounded-xl shadow-elevated text-center border border-border/50 hover:scale-105 transition-all duration-300 hover:shadow-accent/5">
-          <div className="text-3xl font-bold text-accent mb-2">28</div>
-          <div className="text-sm text-muted-foreground">On Leave</div>
+        <div className="bg-[#f9fafb] p-6 rounded-xl shadow-elevated text-center border border-[#e2e8f0] hover:scale-105 transition-all duration-300 hover:shadow-lg">
+          <div className="text-3xl font-bold text-[#0ea5e9] mb-2">28</div>
+          <div className="text-sm text-[#64748b]">On Leave</div>
         </div>
-        <div className="bg-gradient-card p-6 rounded-xl shadow-elevated text-center border border-border/50 hover:scale-105 transition-all duration-300 hover:shadow-destructive/5">
+        <div className="bg-[#f9fafb] p-6 rounded-xl shadow-elevated text-center border border-[#e2e8f0] hover:scale-105 transition-all duration-300 hover:shadow-lg">
           <div className="text-3xl font-bold text-destructive mb-2">25</div>
-          <div className="text-sm text-muted-foreground">Inactive</div>
+          <div className="text-sm text-[#64748b]">Inactive</div>
         </div>
       </div>
     </div>

@@ -28,8 +28,8 @@ export default function Leaves() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Leave Management</h1>
-        <p className="text-muted-foreground mt-2">
+        <h1 className="text-3xl font-bold tracking-tight text-[#1e293b]">Leave Management</h1>
+        <p className="text-[#64748b] mt-2">
           Manage employee leave types, balances, requests, and holidays
         </p>
       </div>

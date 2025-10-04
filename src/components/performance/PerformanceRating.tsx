@@ -54,7 +54,7 @@ export function PerformanceRating() {
 
   const getRatingColor = (rating: number) => {
     if (rating >= 4.5) return "text-green-600";
-    if (rating >= 4.0) return "text-blue-600";
+    if (rating >= 4.0) return "text-sky-600";
     if (rating >= 3.0) return "text-yellow-600";
     return "text-red-600";
   };
@@ -101,7 +101,7 @@ export function PerformanceRating() {
             <CardTitle className="text-sm font-medium">
               Completed Reviews
             </CardTitle>
-            <FileText className="h-4 w-4 text-blue-500" />
+            <FileText className="h-4 w-4 text-sky-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">87%</div>

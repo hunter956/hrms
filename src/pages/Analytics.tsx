@@ -8,8 +8,8 @@ export default function Analytics() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Analytics & Reports</h2>
-        <p className="text-muted-foreground">Workforce, payroll, leave/attendance, and performance insights.</p>
+        <h2 className="text-2xl font-bold tracking-tight text-[#1e293b]">Analytics & Reports</h2>
+        <p className="text-[#64748b]">Workforce, payroll, leave/attendance, and performance insights.</p>
       </div>
       <Tabs defaultValue="employee" className="w-full">
         <TabsList className="w-full max-w-full flex flex-wrap gap-2">

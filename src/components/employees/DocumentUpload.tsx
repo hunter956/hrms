@@ -164,7 +164,7 @@ export function DocumentUpload({ onUpload, uploadedDocuments }: DocumentUploadPr
                       variant="ghost"
                       size="sm"
                       onClick={() => window.open(documentUrl, "_blank")}
-                      className="hover:bg-accent/50"
+                      className="hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]"
                     >
                       <Download className="h-4 w-4" />
                     </Button>

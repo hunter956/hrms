@@ -64,15 +64,14 @@ export function HRMSSidebar() {
 
   const getNavCls = (active: boolean) =>
     active 
-      ? "bg-gradient-primary text-primary-foreground shadow-primary/20 shadow-lg border border-primary/20" 
-      : "hover:bg-accent/50 hover:text-accent-foreground hover:shadow-sm transition-all duration-300 hover:scale-[1.02]";
-
+       ? "bg-[#2563eb] text-white shadow-md border border-[#2563eb]"
+    : "hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]";
   return (
     <Sidebar
-      className={`${collapsed ? "w-16" : "w-64"} border-r bg-gradient-to-b from-card via-card/90 to-card/80 backdrop-blur-sm shadow-elevated transition-smooth`}
+      className={`${collapsed ? "w-16" : "w-64"} border-r border-[#e2e8f0] bg-[#f9fafb] backdrop-blur-sm shadow-elevated transition-smooth`}
       collapsible="icon"
     >
-            <div className="flex h-16 items-center justify-between px-4 border-b border-border/50 bg-gradient-primary/5">
+            <div className="flex h-16 items-center justify-between px-4 border-b border-[#e2e8f0] bg-[#f9fafb]">
         {!collapsed && (
           <div className="flex items-center space-x-2">
             <img
@@ -80,12 +79,12 @@ export function HRMSSidebar() {
               alt="GlobTechno Logo"
               className="h-8 w-auto" // Adjusts image height to fit nicely in 64px header
             />
-            <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold text-[#1e293b]">
               Glob HRMS
             </h1>
           </div>
         )}
-        <SidebarTrigger className="ml-auto hover:bg-accent/50 transition-colors" />
+        <SidebarTrigger className="ml-auto hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]" />
       </div>
 
       <SidebarContent className="py-4">

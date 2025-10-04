@@ -50,7 +50,7 @@ export function AttendanceStats() {
       title: "Total Overtime (hrs)",
       value: stats?.totalOvertime.toFixed(1) || "0.0",
       icon: TrendingUp,
-      color: "text-blue-600",
+      color: "text-sky-600",
     },
   ];
 

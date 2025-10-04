@@ -9,8 +9,8 @@ const Training = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Training & Development</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl font-bold text-[#1e293b]">Training & Development</h1>
+        <p className="text-[#64748b]">
           Manage employee training programs and track skill development
         </p>
       </div>

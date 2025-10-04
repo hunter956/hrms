@@ -89,7 +89,7 @@ export default function AddEmployee() {
         <Button
           variant="outline"
           onClick={() => navigate("/employees")}
-          className="hover:bg-accent/50 hover:scale-105 transition-all duration-300"
+          className="hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Employees
@@ -151,7 +151,7 @@ export default function AddEmployee() {
             <Button
               variant="outline"
               onClick={() => navigate("/employees")}
-              className="hover:bg-accent/50 hover:scale-105 transition-all duration-300"
+              className="hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]"
             >
               Cancel
             </Button>

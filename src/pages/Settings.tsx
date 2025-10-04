@@ -145,7 +145,7 @@ export default function Settings() {
             </label>
             <div className="text-sm text-muted-foreground">Active Sessions: {security.sessions}</div>
             <div>
-              <Button variant="outline" size="sm">Manage Sessions</Button>
+              <Button variant="outline" size="sm" className="hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]">Manage Sessions</Button>
             </div>
           </CardContent>
         </Card>
