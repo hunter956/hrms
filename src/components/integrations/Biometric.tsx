@@ -55,7 +55,7 @@ export default function Biometric() {
             </div>
             <div className="flex items-center justify-end gap-2">
               <Button type="reset" variant="outline" onClick={() => setForm({ name: "", ip: "", location: "" })} className="hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]">Clear</Button>
-              <Button type="submit">Add Device</Button>
+              <Button type="submit"  className="px-6 py-3 h-auto">Add Device</Button>
             </div>
           </form>
         </CardContent>

@@ -91,7 +91,7 @@ const CertificationCompliance = () => {
           </div>
           <Dialog>
             <DialogTrigger asChild>
-              <Button>
+              <Button  className="px-6 py-3 h-auto">
                 <Plus className="mr-2 h-4 w-4" />
                 Add Certification
               </Button>
@@ -147,7 +147,7 @@ const CertificationCompliance = () => {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="submit">Add Certification</Button>
+                  <Button type="submit"  className="px-6 py-3 h-auto">Add Certification</Button>
                 </DialogFooter>
               </form>
             </DialogContent>

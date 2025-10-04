@@ -123,7 +123,7 @@ export function DepartmentsTab() {
           <CardTitle>Departments</CardTitle>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button onClick={resetForm} className="bg-gradient-primary hover:opacity-90">
+              <Button onClick={resetForm}   className="px-6 py-3 h-auto">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Department
               </Button>
