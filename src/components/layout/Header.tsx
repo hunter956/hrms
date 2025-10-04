@@ -16,13 +16,13 @@ import { Badge } from "@/components/ui/badge";
 export function Header() {
   const navigate = useNavigate();
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-gradient-to-r from-card to-card/80 backdrop-blur-sm px-6 shadow-elevated sticky top-0 z-40">
+    <header className="flex h-16 items-center justify-between border-b border-[#e2e8f0] bg-[#f9fafb] backdrop-blur-sm px-6 shadow-elevated sticky top-0 z-40">
       <div className="flex items-center gap-4 flex-1">
         <div className="relative max-w-md flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search employees, departments..."
-            className="pl-10 bg-background/90 backdrop-blur-sm border-border/50 focus:border-primary/50 transition-all duration-300"
+            className="pl-10 bg-white backdrop-blur-sm border-[#e2e8f0] focus:border-[#2563eb] transition-all duration-300"
           />
         </div>
       </div>
@@ -32,7 +32,7 @@ export function Header() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative hover:bg-accent/50 transition-colors"
+          className="relative hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]"
           onClick={() => navigate('/notifications')}
           title="Open Notifications"
         >
@@ -43,7 +43,7 @@ export function Header() {
         {/* User Profile */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2 p-2 hover:bg-accent/50 transition-colors">
+            <Button variant="ghost" className="flex items-center gap-2 p-2 hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]">
               <Avatar className="h-8 w-8 ring-2 ring-primary/20 transition-all hover:ring-primary/40">
                 <AvatarImage src="/avatars/admin.jpg" alt="Admin" />
                 <AvatarFallback className="bg-gradient-primary text-primary-foreground font-semibold">
@@ -56,7 +56,7 @@ export function Header() {
               </div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-card/95 backdrop-blur-sm border-border/50 shadow-elevated">
+          <DropdownMenuContent align="end" className="bg-[#f9fafb] backdrop-blur-sm border-[#e2e8f0] shadow-elevated">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => navigate('/profile')}>

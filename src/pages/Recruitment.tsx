@@ -12,8 +12,8 @@ export default function Recruitment() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Recruitment & Onboarding</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl font-bold text-[#1e293b]">Recruitment & Onboarding</h1>
+        <p className="text-[#64748b]">
           Manage job postings, candidate applications, interviews, and employee onboarding
         </p>
       </div>

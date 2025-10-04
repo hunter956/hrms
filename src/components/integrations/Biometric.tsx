@@ -54,7 +54,7 @@ export default function Biometric() {
               <Input id="location" value={form.location} onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))} />
             </div>
             <div className="flex items-center justify-end gap-2">
-              <Button type="reset" variant="outline" onClick={() => setForm({ name: "", ip: "", location: "" })}>Clear</Button>
+              <Button type="reset" variant="outline" onClick={() => setForm({ name: "", ip: "", location: "" })} className="hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]">Clear</Button>
               <Button type="submit">Add Device</Button>
             </div>
           </form>
@@ -90,7 +90,7 @@ export default function Biometric() {
                     <TableCell>{d.location || "—"}</TableCell>
                     <TableCell>{d.status}</TableCell>
                     <TableCell className="text-right">
-                      <Button size="sm" variant="outline" onClick={() => toggleStatus(d.id)}>Toggle</Button>
+                      <Button size="sm" variant="outline" onClick={() => toggleStatus(d.id)} className="hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]">Toggle</Button>
                     </TableCell>
                   </TableRow>
                 ))}

@@ -10,8 +10,8 @@ export default function Performance() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Performance Management</h1>
-        <p className="text-muted-foreground mt-2">
+        <h1 className="text-3xl font-bold text-[#1e293b]">Performance Management</h1>
+        <p className="text-[#64748b] mt-2">
           Track goals, conduct reviews, and analyze employee performance
         </p>
       </div>
@@ -19,12 +19,12 @@ export default function Performance() {
       <PerformanceStats />
 
       <Tabs defaultValue="goals" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="goals">Goals & KPIs</TabsTrigger>
-          <TabsTrigger value="self-assessment">Self Assessment</TabsTrigger>
-          <TabsTrigger value="manager-review">Manager Review</TabsTrigger>
-          <TabsTrigger value="ratings">Performance Ratings</TabsTrigger>
-          <TabsTrigger value="reports">Reports & Trends</TabsTrigger>
+        <TabsList className="bg-[#f9fafb] border border-[#e2e8f0]">
+          <TabsTrigger value="goals" className="data-[state=active]:bg-[#2563eb] data-[state=active]:text-white hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]">Goals & KPIs</TabsTrigger>
+          <TabsTrigger value="self-assessment" className="data-[state=active]:bg-[#2563eb] data-[state=active]:text-white hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]">Self Assessment</TabsTrigger>
+          <TabsTrigger value="manager-review" className="data-[state=active]:bg-[#2563eb] data-[state=active]:text-white hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]">Manager Review</TabsTrigger>
+          <TabsTrigger value="ratings" className="data-[state=active]:bg-[#2563eb] data-[state=active]:text-white hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]">Performance Ratings</TabsTrigger>
+          <TabsTrigger value="reports" className="data-[state=active]:bg-[#2563eb] data-[state=active]:text-white hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]">Reports & Trends</TabsTrigger>
         </TabsList>
 
         <TabsContent value="goals">

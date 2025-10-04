@@ -28,7 +28,7 @@ export default function ThirdPartyApps() {
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           {available.map((a) => (
-            <Button key={a} variant="outline" onClick={() => add(a)}>Add {a}</Button>
+            <Button key={a} variant="outline" onClick={() => add(a)} className="hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]">Add {a}</Button>
           ))}
         </CardContent>
       </Card>
@@ -58,7 +58,7 @@ export default function ThirdPartyApps() {
                     <TableCell>{c.app}</TableCell>
                     <TableCell>{c.status}</TableCell>
                     <TableCell className="text-right">
-                      <Button size="sm" variant="outline" onClick={() => toggle(c.id)}>{c.status === "Connected" ? "Disconnect" : "Connect"}</Button>
+                      <Button size="sm" variant="outline" onClick={() => toggle(c.id)} className="hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]">{c.status === "Connected" ? "Disconnect" : "Connect"}</Button>
                     </TableCell>
                   </TableRow>
                 ))}
