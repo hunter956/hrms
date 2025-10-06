@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,85 +10,43 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
+const initialDepartments = [
+  {
+    id: "1",
+    name: "Operations",
+    description: "Handles day-to-day operations",
+    parent_department_id: null,
+  },
+  {
+    id: "2",
+    name: "Logistics",
+    description: "Oversees logistics and supply chain",
+    parent_department_id: "1",
+  },
+  {
+    id: "3",
+    name: "Finance",
+    description: "Manages company finances",
+    parent_department_id: null,
+  },
+  {
+    id: "4",
+    name: "Payroll",
+    description: "Manages employee payroll",
+    parent_department_id: "3",
+  },
+];
+
 export function DepartmentsTab() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [departments, setDepartments] = useState(initialDepartments);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     parent_department_id: "",
   });
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const { data: departments, isLoading } = useQuery({
-    queryKey: ["departments"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("departments")
-        .select("*")
-        .order("name");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase.from("departments").insert([{
-        name: data.name,
-        description: data.description,
-        parent_department_id: data.parent_department_id || null,
-      }]);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
-      toast({ title: "Department created successfully" });
-      setIsOpen(false);
-      resetForm();
-    },
-    onError: (error) => {
-      toast({ title: "Error creating department", description: error.message, variant: "destructive" });
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async (data: typeof formData & { id: string }) => {
-      const { error } = await supabase
-        .from("departments")
-        .update({
-          name: data.name,
-          description: data.description,
-          parent_department_id: data.parent_department_id || null,
-        })
-        .eq("id", data.id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
-      toast({ title: "Department updated successfully" });
-      setIsOpen(false);
-      resetForm();
-    },
-    onError: (error) => {
-      toast({ title: "Error updating department", description: error.message, variant: "destructive" });
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("departments").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
-      toast({ title: "Department deleted successfully" });
-    },
-    onError: (error) => {
-      toast({ title: "Error deleting department", description: error.message, variant: "destructive" });
-    },
-  });
 
   const resetForm = () => {
     setFormData({ name: "", description: "", parent_department_id: "" });
@@ -100,10 +56,24 @@ export function DepartmentsTab() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingId) {
-      updateMutation.mutate({ ...formData, id: editingId });
+      setDepartments(departments.map(dept => 
+        dept.id === editingId 
+          ? { ...dept, ...formData, parent_department_id: formData.parent_department_id || null }
+          : dept
+      ));
+      toast({ title: "Department updated successfully" });
     } else {
-      createMutation.mutate(formData);
+      const newDept = {
+        id: String(Date.now()),
+        name: formData.name,
+        description: formData.description,
+        parent_department_id: formData.parent_department_id || null,
+      };
+      setDepartments([...departments, newDept]);
+      toast({ title: "Department created successfully" });
     }
+    setIsOpen(false);
+    resetForm();
   };
 
   const handleEdit = (dept: any) => {
@@ -116,6 +86,11 @@ export function DepartmentsTab() {
     setIsOpen(true);
   };
 
+  const handleDelete = (id: string) => {
+    setDepartments(departments.filter(dept => dept.id !== id));
+    toast({ title: "Department deleted successfully" });
+  };
+
   return (
     <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-elevated">
       <CardHeader className="border-b border-border/50 bg-gradient-primary/5">
@@ -123,7 +98,7 @@ export function DepartmentsTab() {
           <CardTitle>Departments</CardTitle>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button onClick={resetForm}   className="px-6 py-3 h-auto">
+              <Button onClick={resetForm} className="px-6 py-3 h-auto">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Department
               </Button>
@@ -183,47 +158,43 @@ export function DepartmentsTab() {
         </div>
       </CardHeader>
       <CardContent className="pt-6">
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Parent Department</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Parent Department</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {departments?.map((dept) => (
+              <TableRow key={dept.id}>
+                <TableCell className="font-medium">{dept.name}</TableCell>
+                <TableCell>{dept.description}</TableCell>
+                <TableCell>
+                  {departments.find(d => d.id === dept.parent_department_id)?.name || "-"}
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(dept)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(dept.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {departments?.map((dept) => (
-                <TableRow key={dept.id}>
-                  <TableCell className="font-medium">{dept.name}</TableCell>
-                  <TableCell>{dept.description}</TableCell>
-                  <TableCell>
-                    {departments.find(d => d.id === dept.parent_department_id)?.name || "-"}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(dept)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteMutation.mutate(dept.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );
