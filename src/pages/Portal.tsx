@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import LeaveApplication from "@/components/portal/LeaveApplication";
 import LeaveApproval from "@/components/portal/LeaveApproval";
@@ -9,51 +8,39 @@ import PayslipView from "@/components/portal/PayslipView";
 import ExpenseRequests from "@/components/portal/ExpenseRequests";
 import ExpenseApproval from "@/components/portal/ExpenseApproval";
 import ProfileUpdateRequest from "@/components/portal/ProfileUpdateRequest";
-import { User } from "@supabase/supabase-js";
+
+// Hardcoded user data
+const DEMO_USER = {
+  id: "demo-user-123",
+  email: "john.doe@company.com",
+  name: "John Doe",
+  role: "manager", // Can be: "employee", "manager", "admin"
+};
 
 export default function Portal() {
-  const [user, setUser] = useState<User | null>(null);
-  const [isManager, setIsManager] = useState(true); // Demo: show as manager
+  const [user, setUser] = useState(DEMO_USER);
+  const [isManager, setIsManager] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
-  
-  // Demo user ID for preview
-  const demoUserId = "demo-user-id";
 
   useEffect(() => {
-    // Get current user
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        setUser(user);
-        checkUserRoles(user.id);
-      }
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        setUser(session.user);
-        checkUserRoles(session.user.id);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    // Simulate checking user roles
+    checkUserRoles(DEMO_USER.id);
   }, []);
 
-  const checkUserRoles = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
-
-    if (error) {
-      console.log("Role check error:", error);
-      return;
-    }
-
-    const roles = data?.map(r => r.role) || [];
-    setIsManager(roles.includes("manager"));
-    setIsAdmin(roles.includes("admin"));
+  const checkUserRoles = (userId: string) => {
+    // Hardcoded role logic - you can modify DEMO_USER.role above to test different views
+    const userRole = DEMO_USER.role;
+    
+    setIsManager(userRole === "manager" || userRole === "admin");
+    setIsAdmin(userRole === "admin");
+    
+    console.log("User roles loaded:", { 
+      userId, 
+      role: userRole, 
+      isManager: userRole === "manager" || userRole === "admin",
+      isAdmin: userRole === "admin" 
+    });
   };
 
   return (
@@ -85,33 +72,33 @@ export default function Portal() {
         </TabsList>
 
         <TabsContent value="leave-apply" className="space-y-4">
-          <LeaveApplication userId={user?.id || demoUserId} />
+          <LeaveApplication userId={user.id} />
         </TabsContent>
 
         <TabsContent value="attendance" className="space-y-4">
-          <AttendanceView userId={user?.id || demoUserId} />
+          <AttendanceView userId={user.id} />
         </TabsContent>
 
         <TabsContent value="payslips" className="space-y-4">
-          <PayslipView userId={user?.id || demoUserId} />
+          <PayslipView userId={user.id} />
         </TabsContent>
 
         <TabsContent value="expenses" className="space-y-4">
-          <ExpenseRequests userId={user?.id || demoUserId} />
+          <ExpenseRequests userId={user.id} />
         </TabsContent>
 
         <TabsContent value="profile" className="space-y-4">
-          <ProfileUpdateRequest userId={user?.id || demoUserId} />
+          <ProfileUpdateRequest userId={user.id} />
         </TabsContent>
 
         {(isManager || isAdmin) && (
           <>
             <TabsContent value="leave-approval" className="space-y-4">
-              <LeaveApproval managerId={user?.id || demoUserId} />
+              <LeaveApproval managerId={user.id} />
             </TabsContent>
 
             <TabsContent value="expense-approval" className="space-y-4">
-              <ExpenseApproval managerId={user?.id || demoUserId} />
+              <ExpenseApproval managerId={user.id} />
             </TabsContent>
           </>
         )}

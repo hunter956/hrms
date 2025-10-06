@@ -1,63 +1,87 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { User, PlusCircle } from "lucide-react";
-import { toast } from "sonner";
-import { format } from "date-fns";
 
 interface ProfileUpdateRequestProps {
   userId: string;
 }
 
+// Hardcoded initial data
+const INITIAL_REQUESTS = [
+  {
+    id: "1",
+    employee_id: "user123",
+    field_name: "phone",
+    new_value: "+1 234-567-8900",
+    status: "approved",
+    created_at: "2024-09-15T10:30:00Z",
+    manager_comments: "Approved after verification"
+  },
+  {
+    id: "2",
+    employee_id: "user123",
+    field_name: "address",
+    new_value: "123 Main St, New York, NY 10001",
+    status: "pending",
+    created_at: "2024-10-01T14:20:00Z",
+    manager_comments: null
+  },
+  {
+    id: "3",
+    employee_id: "user123",
+    field_name: "emergency_contact",
+    new_value: "Jane Doe - +1 555-123-4567",
+    status: "rejected",
+    created_at: "2024-08-20T09:15:00Z",
+    manager_comments: "Please provide relationship details"
+  }
+];
+
 export default function ProfileUpdateRequest({ userId }: ProfileUpdateRequestProps) {
   const [fieldName, setFieldName] = useState("");
   const [newValue, setNewValue] = useState("");
-  const queryClient = useQueryClient();
+  const [updateRequests, setUpdateRequests] = useState(INITIAL_REQUESTS);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: updateRequests } = useQuery({
-    queryKey: ["profile-update-requests", userId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profile_update_requests")
-        .select("*")
-        .eq("employee_id", userId)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
+  const handleSubmit = () => {
+    if (!fieldName || !newValue) {
+      alert("Please fill all fields");
+      return;
+    }
 
-  const submitUpdateMutation = useMutation({
-    mutationFn: async () => {
-      if (!fieldName || !newValue) {
-        throw new Error("Please fill all fields");
-      }
+    setIsSubmitting(true);
 
-      const { error } = await supabase.from("profile_update_requests").insert({
+    // Simulate API call
+    setTimeout(() => {
+      const newRequest = {
+        id: String(updateRequests.length + 1),
         employee_id: userId,
         field_name: fieldName,
         new_value: newValue,
-      });
+        status: "pending",
+        created_at: new Date().toISOString(),
+        manager_comments: null
+      };
 
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Profile update request submitted successfully");
+      setUpdateRequests([newRequest, ...updateRequests]);
       setFieldName("");
       setNewValue("");
-      queryClient.invalidateQueries({ queryKey: ["profile-update-requests", userId] });
-    },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    },
-  });
+      setIsSubmitting(false);
+      
+      // Show success message
+      alert("Profile update request submitted successfully");
+    }, 500);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -107,8 +131,8 @@ export default function ProfileUpdateRequest({ userId }: ProfileUpdateRequestPro
               </div>
             </div>
 
-            <Button onClick={() => submitUpdateMutation.mutate()} disabled={submitUpdateMutation.isPending}>
-              {submitUpdateMutation.isPending ? "Submitting..." : "Submit Update Request"}
+            <Button onClick={handleSubmit} disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Submit Update Request"}
             </Button>
           </div>
         </CardContent>
@@ -123,30 +147,32 @@ export default function ProfileUpdateRequest({ userId }: ProfileUpdateRequestPro
           <CardDescription>View your profile update request history</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Field Name</TableHead>
-                <TableHead>New Value</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Submitted</TableHead>
-                <TableHead>Comments</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {updateRequests?.map((request) => (
-                <TableRow key={request.id}>
-                  <TableCell className="capitalize">{request.field_name.replace("_", " ")}</TableCell>
-                  <TableCell>{request.new_value}</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(request.status)}>{request.status}</Badge>
-                  </TableCell>
-                  <TableCell>{format(new Date(request.created_at), "PP")}</TableCell>
-                  <TableCell>{request.manager_comments || "-"}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left p-4 font-medium">Field Name</th>
+                  <th className="text-left p-4 font-medium">New Value</th>
+                  <th className="text-left p-4 font-medium">Status</th>
+                  <th className="text-left p-4 font-medium">Submitted</th>
+                  <th className="text-left p-4 font-medium">Comments</th>
+                </tr>
+              </thead>
+              <tbody>
+                {updateRequests.map((request) => (
+                  <tr key={request.id} className="border-b hover:bg-gray-50">
+                    <td className="p-4 capitalize">{request.field_name.replace("_", " ")}</td>
+                    <td className="p-4">{request.new_value}</td>
+                    <td className="p-4">
+                      <Badge className={getStatusColor(request.status)}>{request.status}</Badge>
+                    </td>
+                    <td className="p-4">{formatDate(request.created_at)}</td>
+                    <td className="p-4">{request.manager_comments || "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
     </div>

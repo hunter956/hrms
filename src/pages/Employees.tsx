@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Filter, Download } from "lucide-react";
+import { Plus, Filter, Download, Clock, Calendar, DollarSign, TrendingUp, LogOut, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EmployeeTable } from "@/components/employees/EmployeeTable";
@@ -34,6 +34,30 @@ export default function Employees() {
           <Plus className="mr-2 h-5 w-5" />
           Add Employee
         </Button>
+      </div>
+
+      <div className="bg-[#f9fafb] p-6 rounded-xl shadow-elevated border border-[#e2e8f0]">
+        <h2 className="text-lg font-semibold text-[#1e293b] mb-4">Related Modules</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <Button variant="outline" className="justify-start gap-2" onClick={() => window.open('/employees', '_blank', 'noopener,noreferrer')}>
+            <Users className="h-4 w-4" /> Employee Management
+          </Button>
+          <Button variant="outline" className="justify-start gap-2" onClick={() => window.open('/attendance', '_blank', 'noopener,noreferrer')}>
+            <Clock className="h-4 w-4" /> Attendance & Time
+          </Button>
+          <Button variant="outline" className="justify-start gap-2" onClick={() => window.open('/leaves', '_blank', 'noopener,noreferrer')}>
+            <Calendar className="h-4 w-4" /> Leave Management
+          </Button>
+          <Button variant="outline" className="justify-start gap-2" onClick={() => window.open('/payroll', '_blank', 'noopener,noreferrer')}>
+            <DollarSign className="h-4 w-4" /> Payroll Management
+          </Button>
+          <Button variant="outline" className="justify-start gap-2" onClick={() => window.open('/performance', '_blank', 'noopener,noreferrer')}>
+            <TrendingUp className="h-4 w-4" /> Performance
+          </Button>
+          <Button variant="outline" className="justify-start gap-2" onClick={() => window.open('/exit', '_blank', 'noopener,noreferrer')}>
+            <LogOut className="h-4 w-4" /> Exit Management
+          </Button>
+        </div>
       </div>
 
       {/* Filters and Search */}

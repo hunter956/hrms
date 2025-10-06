@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,10 +41,49 @@ const DAYS_OF_WEEK = [
   "Sunday",
 ];
 
+// Hardcoded shifts data
+const mockShifts = [
+  { id: "1", name: "Morning Shift", start_time: "09:00", end_time: "17:00" },
+  { id: "2", name: "Evening Shift", start_time: "14:00", end_time: "22:00" },
+  { id: "3", name: "Night Shift", start_time: "22:00", end_time: "06:00" },
+  { id: "4", name: "Full Day", start_time: "08:00", end_time: "18:00" },
+];
+
+// Hardcoded rosters data
+const initialRosters = [
+  {
+    id: "1",
+    employee_id: "EMP001",
+    shift_id: "1",
+    effective_from: "2025-10-01",
+    effective_to: null,
+    days_of_week: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    shifts: { name: "Morning Shift", start_time: "09:00", end_time: "17:00" },
+  },
+  {
+    id: "2",
+    employee_id: "EMP002",
+    shift_id: "2",
+    effective_from: "2025-10-01",
+    effective_to: "2025-12-31",
+    days_of_week: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    shifts: { name: "Evening Shift", start_time: "14:00", end_time: "22:00" },
+  },
+  {
+    id: "3",
+    employee_id: "EMP003",
+    shift_id: "3",
+    effective_from: "2025-10-01",
+    effective_to: null,
+    days_of_week: ["Saturday", "Sunday"],
+    shifts: { name: "Night Shift", start_time: "22:00", end_time: "06:00" },
+  },
+];
+
 export function RosterManagement() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [rosters, setRosters] = useState(initialRosters);
 
   const [formData, setFormData] = useState({
     employee_id: "",
@@ -56,70 +93,47 @@ export function RosterManagement() {
     days_of_week: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
   });
 
-  const { data: rosters, isLoading } = useQuery({
-    queryKey: ["rosters"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("rosters")
-        .select("*, shifts(*)")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
+  const shifts = mockShifts;
+  const isLoading = false;
 
-  const { data: shifts } = useQuery({
-    queryKey: ["shifts"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("shifts").select("*");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase.from("rosters").insert({
-        employee_id: data.employee_id,
-        shift_id: data.shift_id,
-        effective_from: data.effective_from,
-        effective_to: data.effective_to || null,
-        days_of_week: data.days_of_week,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({ title: "Success", description: "Roster created successfully" });
-      queryClient.invalidateQueries({ queryKey: ["rosters"] });
-      setIsDialogOpen(false);
-      resetForm();
-    },
-    onError: () => {
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.days_of_week.length === 0) {
       toast({
         title: "Error",
-        description: "Failed to create roster",
+        description: "Please select at least one day",
         variant: "destructive",
       });
-    },
-  });
+      return;
+    }
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("rosters").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({ title: "Success", description: "Roster deleted successfully" });
-      queryClient.invalidateQueries({ queryKey: ["rosters"] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete roster",
-        variant: "destructive",
-      });
-    },
-  });
+    const selectedShift = shifts.find((s) => s.id === formData.shift_id);
+    if (!selectedShift) return;
+
+    const newRoster = {
+      id: Date.now().toString(),
+      employee_id: formData.employee_id,
+      shift_id: formData.shift_id,
+      effective_from: formData.effective_from,
+      effective_to: formData.effective_to || null,
+      days_of_week: formData.days_of_week,
+      shifts: {
+        name: selectedShift.name,
+        start_time: selectedShift.start_time,
+        end_time: selectedShift.end_time,
+      },
+    };
+
+    setRosters([newRoster, ...rosters]);
+    toast({ title: "Success", description: "Roster created successfully" });
+    setIsDialogOpen(false);
+    resetForm();
+  };
+
+  const handleDelete = (id: string) => {
+    setRosters(rosters.filter((r) => r.id !== id));
+    toast({ title: "Success", description: "Roster deleted successfully" });
+  };
 
   const resetForm = () => {
     setFormData({
@@ -138,19 +152,6 @@ export function RosterManagement() {
         ? prev.days_of_week.filter((d) => d !== day)
         : [...prev.days_of_week, day],
     }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.days_of_week.length === 0) {
-      toast({
-        title: "Error",
-        description: "Please select at least one day",
-        variant: "destructive",
-      });
-      return;
-    }
-    createMutation.mutate(formData);
   };
 
   return (
@@ -173,7 +174,7 @@ export function RosterManagement() {
             </Button>
           </DialogTrigger>
           <DialogContent>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleCreate}>
               <DialogHeader>
                 <DialogTitle>Create Roster Assignment</DialogTitle>
                 <DialogDescription>
@@ -274,7 +275,7 @@ export function RosterManagement() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={createMutation.isPending}>
+                <Button type="submit">
                   Create Roster
                 </Button>
               </DialogFooter>
@@ -343,7 +344,7 @@ export function RosterManagement() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => deleteMutation.mutate(roster.id)}
+                      onClick={() => handleDelete(roster.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
