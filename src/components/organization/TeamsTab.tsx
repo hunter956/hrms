@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,9 +10,47 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
+const initialDepartments = [
+  { id: "1", name: "Operations" },
+  { id: "2", name: "Logistics" },
+  { id: "3", name: "Finance" },
+  { id: "4", name: "Payroll" },
+];
+
+const initialBranches = [
+  { id: "1", name: "Head Office" },
+  { id: "2", name: "Branch A" },
+  { id: "3", name: "Branch B" },
+];
+
+const initialTeams = [
+  {
+    id: "1",
+    name: "Development Team",
+    description: "Software development and engineering",
+    department_id: "1",
+    branch_id: "1",
+  },
+  {
+    id: "2",
+    name: "Support Team",
+    description: "Customer support and assistance",
+    department_id: "1",
+    branch_id: "2",
+  },
+  {
+    id: "3",
+    name: "Accounting Team",
+    description: "Financial reporting and accounting",
+    department_id: "3",
+    branch_id: "1",
+  },
+];
+
 export function TeamsTab() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [teams, setTeams] = useState(initialTeams);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -22,93 +58,6 @@ export function TeamsTab() {
     branch_id: "",
   });
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const { data: teams, isLoading } = useQuery({
-    queryKey: ["teams"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("teams")
-        .select("*, departments(name), branches(name)")
-        .order("name");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: departments } = useQuery({
-    queryKey: ["departments"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("departments")
-        .select("*")
-        .order("name");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: branches } = useQuery({
-    queryKey: ["branches"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("branches")
-        .select("*")
-        .order("name");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase.from("teams").insert([{
-        name: data.name,
-        description: data.description,
-        department_id: data.department_id || null,
-        branch_id: data.branch_id || null,
-      }]);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teams"] });
-      toast({ title: "Team created successfully" });
-      setIsOpen(false);
-      resetForm();
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async (data: typeof formData & { id: string }) => {
-      const { error } = await supabase
-        .from("teams")
-        .update({
-          name: data.name,
-          description: data.description,
-          department_id: data.department_id || null,
-          branch_id: data.branch_id || null,
-        })
-        .eq("id", data.id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teams"] });
-      toast({ title: "Team updated successfully" });
-      setIsOpen(false);
-      resetForm();
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("teams").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teams"] });
-      toast({ title: "Team deleted successfully" });
-    },
-  });
 
   const resetForm = () => {
     setFormData({ name: "", description: "", department_id: "", branch_id: "" });
@@ -118,10 +67,30 @@ export function TeamsTab() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingId) {
-      updateMutation.mutate({ ...formData, id: editingId });
+      setTeams(teams.map(team => 
+        team.id === editingId 
+          ? { 
+              ...team, 
+              ...formData, 
+              department_id: formData.department_id || null,
+              branch_id: formData.branch_id || null,
+            }
+          : team
+      ));
+      toast({ title: "Team updated successfully" });
     } else {
-      createMutation.mutate(formData);
+      const newTeam = {
+        id: String(Date.now()),
+        name: formData.name,
+        description: formData.description,
+        department_id: formData.department_id || null,
+        branch_id: formData.branch_id || null,
+      };
+      setTeams([...teams, newTeam]);
+      toast({ title: "Team created successfully" });
     }
+    setIsOpen(false);
+    resetForm();
   };
 
   const handleEdit = (team: any) => {
@@ -135,6 +104,11 @@ export function TeamsTab() {
     setIsOpen(true);
   };
 
+  const handleDelete = (id: string) => {
+    setTeams(teams.filter(team => team.id !== id));
+    toast({ title: "Team deleted successfully" });
+  };
+
   return (
     <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-elevated">
       <CardHeader className="border-b border-border/50 bg-gradient-primary/5">
@@ -142,7 +116,7 @@ export function TeamsTab() {
           <CardTitle>Teams</CardTitle>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button onClick={resetForm}  className="px-6 py-3 h-auto">
+              <Button onClick={resetForm} className="px-6 py-3 h-auto">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Team
               </Button>
@@ -180,7 +154,7 @@ export function TeamsTab() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="">None</SelectItem>
-                      {departments?.map((dept) => (
+                      {initialDepartments?.map((dept) => (
                         <SelectItem key={dept.id} value={dept.id}>
                           {dept.name}
                         </SelectItem>
@@ -199,7 +173,7 @@ export function TeamsTab() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="">None</SelectItem>
-                      {branches?.map((branch) => (
+                      {initialBranches?.map((branch) => (
                         <SelectItem key={branch.id} value={branch.id}>
                           {branch.name}
                         </SelectItem>
@@ -221,47 +195,47 @@ export function TeamsTab() {
         </div>
       </CardHeader>
       <CardContent className="pt-6">
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Branch</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Department</TableHead>
+              <TableHead>Branch</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {teams?.map((team) => (
+              <TableRow key={team.id}>
+                <TableCell className="font-medium">{team.name}</TableCell>
+                <TableCell>{team.description || "-"}</TableCell>
+                <TableCell>
+                  {initialDepartments.find(d => d.id === team.department_id)?.name || "-"}
+                </TableCell>
+                <TableCell>
+                  {initialBranches.find(b => b.id === team.branch_id)?.name || "-"}
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(team)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(team.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {teams?.map((team) => (
-                <TableRow key={team.id}>
-                  <TableCell className="font-medium">{team.name}</TableCell>
-                  <TableCell>{team.description || "-"}</TableCell>
-                  <TableCell>{team.departments?.name || "-"}</TableCell>
-                  <TableCell>{team.branches?.name || "-"}</TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(team)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteMutation.mutate(team.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );

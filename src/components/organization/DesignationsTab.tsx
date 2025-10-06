@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,9 +11,62 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
+const initialDepartments = [
+  { id: "1", name: "Operations" },
+  { id: "2", name: "Logistics" },
+  { id: "3", name: "Finance" },
+  { id: "4", name: "Payroll" },
+];
+
+const initialDesignations = [
+  {
+    id: "1",
+    title: "Chief Executive Officer",
+    description: "Overall strategic leadership",
+    level: 1,
+    department_id: null,
+  },
+  {
+    id: "2",
+    title: "Vice President",
+    description: "Senior executive management",
+    level: 2,
+    department_id: "1",
+  },
+  {
+    id: "3",
+    title: "Director",
+    description: "Department head and strategic planning",
+    level: 2,
+    department_id: "3",
+  },
+  {
+    id: "4",
+    title: "Manager",
+    description: "Team management and operations",
+    level: 3,
+    department_id: "1",
+  },
+  {
+    id: "5",
+    title: "Senior Associate",
+    description: "Experienced professional role",
+    level: 4,
+    department_id: "2",
+  },
+  {
+    id: "6",
+    title: "Associate",
+    description: "Entry-level professional",
+    level: 5,
+    department_id: null,
+  },
+];
+
 export function DesignationsTab() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [designations, setDesignations] = useState(initialDesignations);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -23,81 +74,6 @@ export function DesignationsTab() {
     department_id: "",
   });
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const { data: designations, isLoading } = useQuery({
-    queryKey: ["designations"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("designations")
-        .select("*, departments(name)")
-        .order("level");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: departments } = useQuery({
-    queryKey: ["departments"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("departments")
-        .select("*")
-        .order("name");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase.from("designations").insert([{
-        title: data.title,
-        description: data.description,
-        level: parseInt(data.level),
-        department_id: data.department_id || null,
-      }]);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["designations"] });
-      toast({ title: "Designation created successfully" });
-      setIsOpen(false);
-      resetForm();
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async (data: typeof formData & { id: string }) => {
-      const { error } = await supabase
-        .from("designations")
-        .update({
-          title: data.title,
-          description: data.description,
-          level: parseInt(data.level),
-          department_id: data.department_id || null,
-        })
-        .eq("id", data.id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["designations"] });
-      toast({ title: "Designation updated successfully" });
-      setIsOpen(false);
-      resetForm();
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("designations").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["designations"] });
-      toast({ title: "Designation deleted successfully" });
-    },
-  });
 
   const resetForm = () => {
     setFormData({ title: "", description: "", level: "1", department_id: "" });
@@ -107,10 +83,31 @@ export function DesignationsTab() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingId) {
-      updateMutation.mutate({ ...formData, id: editingId });
+      setDesignations(designations.map(designation => 
+        designation.id === editingId 
+          ? { 
+              ...designation, 
+              title: formData.title,
+              description: formData.description,
+              level: parseInt(formData.level),
+              department_id: formData.department_id || null,
+            }
+          : designation
+      ));
+      toast({ title: "Designation updated successfully" });
     } else {
-      createMutation.mutate(formData);
+      const newDesignation = {
+        id: String(Date.now()),
+        title: formData.title,
+        description: formData.description,
+        level: parseInt(formData.level),
+        department_id: formData.department_id || null,
+      };
+      setDesignations([...designations, newDesignation]);
+      toast({ title: "Designation created successfully" });
     }
+    setIsOpen(false);
+    resetForm();
   };
 
   const handleEdit = (designation: any) => {
@@ -124,10 +121,15 @@ export function DesignationsTab() {
     setIsOpen(true);
   };
 
+  const handleDelete = (id: string) => {
+    setDesignations(designations.filter(designation => designation.id !== id));
+    toast({ title: "Designation deleted successfully" });
+  };
+
   const getLevelBadgeVariant = (level: number) => {
     if (level <= 2) return "default";
-    if (level <= 4) return "secondary";
-    return "outline";
+    if (level <= 5) return "secondary";
+    return "destructive";
   };
 
   return (
@@ -137,7 +139,7 @@ export function DesignationsTab() {
           <CardTitle>Designations & Roles</CardTitle>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button onClick={resetForm}  className="px-6 py-3 h-auto">
+              <Button onClick={resetForm} className="px-6 py-3 h-auto">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Designation
               </Button>
@@ -193,7 +195,7 @@ export function DesignationsTab() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="">None</SelectItem>
-                      {departments?.map((dept) => (
+                      {initialDepartments?.map((dept) => (
                         <SelectItem key={dept.id} value={dept.id}>
                           {dept.name}
                         </SelectItem>
@@ -215,51 +217,49 @@ export function DesignationsTab() {
         </div>
       </CardHeader>
       <CardContent className="pt-6">
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Level</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Level</TableHead>
+              <TableHead>Department</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {designations?.map((designation) => (
+              <TableRow key={designation.id}>
+                <TableCell className="font-medium">{designation.title}</TableCell>
+                <TableCell>{designation.description || "-"}</TableCell>
+                <TableCell>
+                  <Badge variant={getLevelBadgeVariant(designation.level)}>
+                    Level {designation.level}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {initialDepartments.find(d => d.id === designation.department_id)?.name || "-"}
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(designation)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(designation.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {designations?.map((designation) => (
-                <TableRow key={designation.id}>
-                  <TableCell className="font-medium">{designation.title}</TableCell>
-                  <TableCell>{designation.description || "-"}</TableCell>
-                  <TableCell>
-                    <Badge variant={getLevelBadgeVariant(designation.level)}>
-                      Level {designation.level}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{designation.departments?.name || "-"}</TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(designation)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteMutation.mutate(designation.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );

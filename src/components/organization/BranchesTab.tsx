@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,9 +10,53 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
+const initialDepartments = [
+  {
+    id: "1",
+    name: "Operations",
+  },
+  {
+    id: "2",
+    name: "Logistics",
+  },
+  {
+    id: "3",
+    name: "Finance",
+  },
+  {
+    id: "4",
+    name: "Payroll",
+  },
+];
+
+const initialBranches = [
+  {
+    id: "1",
+    name: "Head Office",
+    location: "New York, USA",
+    address: "Main corporate headquarters",
+    department_id: null,
+  },
+  {
+    id: "2",
+    name: "Branch A",
+    location: "London, UK",
+    address: "European operations center",
+    department_id: null,
+  },
+  {
+    id: "3",
+    name: "Branch B",
+    location: "Tokyo, Japan",
+    address: "APAC regional branch",
+    department_id: null,
+  },
+];
+
 export function BranchesTab() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [branches, setBranches] = useState(initialBranches);
   const [formData, setFormData] = useState({
     name: "",
     location: "",
@@ -22,81 +64,6 @@ export function BranchesTab() {
     department_id: "",
   });
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const { data: branches, isLoading } = useQuery({
-    queryKey: ["branches"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("branches")
-        .select("*, departments(name)")
-        .order("name");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: departments } = useQuery({
-    queryKey: ["departments"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("departments")
-        .select("*")
-        .order("name");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase.from("branches").insert([{
-        name: data.name,
-        location: data.location,
-        address: data.address,
-        department_id: data.department_id || null,
-      }]);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["branches"] });
-      toast({ title: "Branch created successfully" });
-      setIsOpen(false);
-      resetForm();
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async (data: typeof formData & { id: string }) => {
-      const { error } = await supabase
-        .from("branches")
-        .update({
-          name: data.name,
-          location: data.location,
-          address: data.address,
-          department_id: data.department_id || null,
-        })
-        .eq("id", data.id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["branches"] });
-      toast({ title: "Branch updated successfully" });
-      setIsOpen(false);
-      resetForm();
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("branches").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["branches"] });
-      toast({ title: "Branch deleted successfully" });
-    },
-  });
 
   const resetForm = () => {
     setFormData({ name: "", location: "", address: "", department_id: "" });
@@ -106,10 +73,25 @@ export function BranchesTab() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingId) {
-      updateMutation.mutate({ ...formData, id: editingId });
+      setBranches(branches.map(branch => 
+        branch.id === editingId 
+          ? { ...branch, ...formData, department_id: formData.department_id || null }
+          : branch
+      ));
+      toast({ title: "Branch updated successfully" });
     } else {
-      createMutation.mutate(formData);
+      const newBranch = {
+        id: String(Date.now()),
+        name: formData.name,
+        location: formData.location,
+        address: formData.address,
+        department_id: formData.department_id || null,
+      };
+      setBranches([...branches, newBranch]);
+      toast({ title: "Branch created successfully" });
     }
+    setIsOpen(false);
+    resetForm();
   };
 
   const handleEdit = (branch: any) => {
@@ -123,6 +105,11 @@ export function BranchesTab() {
     setIsOpen(true);
   };
 
+  const handleDelete = (id: string) => {
+    setBranches(branches.filter(branch => branch.id !== id));
+    toast({ title: "Branch deleted successfully" });
+  };
+
   return (
     <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-elevated">
       <CardHeader className="border-b border-border/50 bg-gradient-primary/5">
@@ -130,7 +117,7 @@ export function BranchesTab() {
           <CardTitle>Branches</CardTitle>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button onClick={resetForm}  className="px-6 py-3 h-auto">
+              <Button onClick={resetForm} className="px-6 py-3 h-auto">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Branch
               </Button>
@@ -176,7 +163,7 @@ export function BranchesTab() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="">None</SelectItem>
-                      {departments?.map((dept) => (
+                      {initialDepartments?.map((dept) => (
                         <SelectItem key={dept.id} value={dept.id}>
                           {dept.name}
                         </SelectItem>
@@ -198,45 +185,43 @@ export function BranchesTab() {
         </div>
       </CardHeader>
       <CardContent className="pt-6">
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Location</TableHead>
+              <TableHead>Department</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {branches?.map((branch) => (
+              <TableRow key={branch.id}>
+                <TableCell className="font-medium">{branch.name}</TableCell>
+                <TableCell>{branch.location || "-"}</TableCell>
+                <TableCell>
+                  {initialDepartments.find(d => d.id === branch.department_id)?.name || "-"}
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(branch)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(branch.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {branches?.map((branch) => (
-                <TableRow key={branch.id}>
-                  <TableCell className="font-medium">{branch.name}</TableCell>
-                  <TableCell>{branch.location || "-"}</TableCell>
-                  <TableCell>{branch.departments?.name || "-"}</TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(branch)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteMutation.mutate(branch.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );
