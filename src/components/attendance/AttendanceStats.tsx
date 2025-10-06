@@ -1,54 +1,37 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Clock, AlertCircle, TrendingUp } from "lucide-react";
-import { format } from "date-fns";
 
 export function AttendanceStats() {
-  const today = format(new Date(), "yyyy-MM-dd");
-
-  const { data: stats } = useQuery({
-    queryKey: ["attendance-stats", today],
-    queryFn: async () => {
-      const { data: todayRecords, error } = await supabase
-        .from("attendance_records")
-        .select("status, overtime_hours")
-        .eq("date", today);
-
-      if (error) throw error;
-
-      const present = todayRecords?.filter((r) => r.status === "present").length || 0;
-      const late = todayRecords?.filter((r) => r.status === "late").length || 0;
-      const absent = todayRecords?.filter((r) => r.status === "absent").length || 0;
-      const totalOvertime =
-        todayRecords?.reduce((sum, r) => sum + (Number(r.overtime_hours) || 0), 0) || 0;
-
-      return { present, late, absent, totalOvertime };
-    },
-  });
+  // Hardcoded stats data
+  const stats = {
+    present: 45,
+    late: 8,
+    absent: 3,
+    totalOvertime: 12.5
+  };
 
   const statCards = [
     {
       title: "Present Today",
-      value: stats?.present || 0,
+      value: stats.present,
       icon: Users,
       color: "text-green-600",
     },
     {
       title: "Late Arrivals",
-      value: stats?.late || 0,
+      value: stats.late,
       icon: Clock,
       color: "text-yellow-600",
     },
     {
       title: "Absent",
-      value: stats?.absent || 0,
+      value: stats.absent,
       icon: AlertCircle,
       color: "text-red-600",
     },
     {
       title: "Total Overtime (hrs)",
-      value: stats?.totalOvertime.toFixed(1) || "0.0",
+      value: stats.totalOvertime.toFixed(1),
       icon: TrendingUp,
       color: "text-sky-600",
     },

@@ -1,25 +1,86 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { toast } from "sonner";
-import { useForm } from "react-hook-form";
 import { Plus, Edit, Trash2, DollarSign } from "lucide-react";
-import { format } from "date-fns";
+
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+};
+
+const getCurrentDate = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 export default function SalaryStructure() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const queryClient = useQueryClient();
+  const [editingId, setEditingId] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [nextId, setNextId] = useState(4);
 
-  const form = useForm({
-    defaultValues: {
+  const [structures, setStructures] = useState([
+    {
+      id: "1",
+      employee_id: "EMP001",
+      basic_salary: 30000,
+      hra: 12000,
+      transport_allowance: 3000,
+      medical_allowance: 2000,
+      special_allowance: 5000,
+      other_allowances: 3000,
+      effective_from: "2025-01-01",
+      created_at: "2025-01-01T00:00:00Z"
+    },
+    {
+      id: "2",
+      employee_id: "EMP002",
+      basic_salary: 40000,
+      hra: 16000,
+      transport_allowance: 4000,
+      medical_allowance: 2500,
+      special_allowance: 7000,
+      other_allowances: 4000,
+      effective_from: "2025-01-01",
+      created_at: "2025-01-01T00:00:00Z"
+    },
+    {
+      id: "3",
+      employee_id: "EMP003",
+      basic_salary: 50000,
+      hra: 20000,
+      transport_allowance: 5000,
+      medical_allowance: 3000,
+      special_allowance: 9000,
+      other_allowances: 5000,
+      effective_from: "2025-01-01",
+      created_at: "2025-01-01T00:00:00Z"
+    }
+  ]);
+
+  const [formData, setFormData] = useState({
+    employee_id: "",
+    basic_salary: "",
+    hra: "",
+    transport_allowance: "",
+    medical_allowance: "",
+    special_allowance: "",
+    other_allowances: "",
+    effective_from: getCurrentDate(),
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const resetForm = () => {
+    setFormData({
       employee_id: "",
       basic_salary: "",
       hra: "",
@@ -27,79 +88,57 @@ export default function SalaryStructure() {
       medical_allowance: "",
       special_allowance: "",
       other_allowances: "",
-      effective_from: format(new Date(), "yyyy-MM-dd"),
-    },
-  });
+      effective_from: getCurrentDate(),
+    });
+  };
 
-  const { data: structures, isLoading } = useQuery({
-    queryKey: ["salary-structures"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("salary_structures")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSaving(true);
 
-  const saveMutation = useMutation({
-    mutationFn: async (values: any) => {
+    try {
       const payload = {
-        ...values,
-        basic_salary: parseFloat(values.basic_salary) || 0,
-        hra: parseFloat(values.hra) || 0,
-        transport_allowance: parseFloat(values.transport_allowance) || 0,
-        medical_allowance: parseFloat(values.medical_allowance) || 0,
-        special_allowance: parseFloat(values.special_allowance) || 0,
-        other_allowances: parseFloat(values.other_allowances) || 0,
+        employee_id: formData.employee_id,
+        basic_salary: parseFloat(formData.basic_salary) || 0,
+        hra: parseFloat(formData.hra) || 0,
+        transport_allowance: parseFloat(formData.transport_allowance) || 0,
+        medical_allowance: parseFloat(formData.medical_allowance) || 0,
+        special_allowance: parseFloat(formData.special_allowance) || 0,
+        other_allowances: parseFloat(formData.other_allowances) || 0,
+        effective_from: formData.effective_from,
       };
 
       if (editingId) {
-        const { error } = await supabase
-          .from("salary_structures")
-          .update(payload)
-          .eq("id", editingId);
-        if (error) throw error;
+        // Update existing structure
+        setStructures(structures.map(s => 
+          s.id === editingId ? { ...s, ...payload } : s
+        ));
+        alert("Salary structure updated");
       } else {
-        const { error } = await supabase
-          .from("salary_structures")
-          .insert([payload]);
-        if (error) throw error;
+        // Add new structure
+        const newStructure = {
+          ...payload,
+          id: nextId.toString(),
+          created_at: new Date().toISOString()
+        };
+        setStructures([newStructure, ...structures]);
+        setNextId(nextId + 1);
+        alert("Salary structure created");
       }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["salary-structures"] });
-      toast.success(editingId ? "Salary structure updated" : "Salary structure created");
+
       setIsDialogOpen(false);
       setEditingId(null);
-      form.reset();
-    },
-    onError: (error) => {
-      toast.error("Failed to save salary structure: " + error.message);
-    },
-  });
+      resetForm();
+    } catch (error) {
+      alert("Failed to save salary structure: " + error.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("salary_structures")
-        .delete()
-        .eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["salary-structures"] });
-      toast.success("Salary structure deleted");
-    },
-    onError: (error) => {
-      toast.error("Failed to delete: " + error.message);
-    },
-  });
-
-  const handleEdit = (structure: any) => {
+  const handleEdit = (structure) => {
     setEditingId(structure.id);
-    form.reset({
+    setFormData({
       employee_id: structure.employee_id,
       basic_salary: structure.basic_salary.toString(),
       hra: structure.hra.toString(),
@@ -112,7 +151,14 @@ export default function SalaryStructure() {
     setIsDialogOpen(true);
   };
 
-  const calculateTotal = (structure: any) => {
+  const handleDelete = (id) => {
+    if (confirm("Are you sure you want to delete this salary structure?")) {
+      setStructures(structures.filter(s => s.id !== id));
+      alert("Salary structure deleted");
+    }
+  };
+
+  const calculateTotal = (structure) => {
     return (
       parseFloat(structure.basic_salary) +
       parseFloat(structure.hra) +
@@ -121,6 +167,12 @@ export default function SalaryStructure() {
       parseFloat(structure.special_allowance) +
       parseFloat(structure.other_allowances)
     );
+  };
+
+  const handleOpenDialog = () => {
+    setEditingId(null);
+    resetForm();
+    setIsDialogOpen(true);
   };
 
   return (
@@ -138,7 +190,7 @@ export default function SalaryStructure() {
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => { setEditingId(null); form.reset(); }}  className="px-6 py-3 h-auto">
+              <Button onClick={handleOpenDialog} className="px-6 py-3 h-auto">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Structure
               </Button>
@@ -152,170 +204,146 @@ export default function SalaryStructure() {
                   Define salary components for an employee
                 </DialogDescription>
               </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit((data) => saveMutation.mutate(data))} className="space-y-4">
-                  <FormField
-                    control={form.control}
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Employee ID</label>
+                  <Input
                     name="employee_id"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Employee ID</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter employee ID" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    value={formData.employee_id}
+                    onChange={handleInputChange}
+                    placeholder="Enter employee ID"
                   />
+                </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium">Basic Salary</label>
+                    <Input
                       name="basic_salary"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Basic Salary</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="number" step="0.01" placeholder="0.00" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      type="number"
+                      step="0.01"
+                      value={formData.basic_salary}
+                      onChange={handleInputChange}
+                      placeholder="0.00"
                     />
+                  </div>
 
-                    <FormField
-                      control={form.control}
+                  <div>
+                    <label className="text-sm font-medium">HRA</label>
+                    <Input
                       name="hra"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>HRA</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="number" step="0.01" placeholder="0.00" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      type="number"
+                      step="0.01"
+                      value={formData.hra}
+                      onChange={handleInputChange}
+                      placeholder="0.00"
                     />
+                  </div>
 
-                    <FormField
-                      control={form.control}
+                  <div>
+                    <label className="text-sm font-medium">Transport Allowance</label>
+                    <Input
                       name="transport_allowance"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Transport Allowance</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="number" step="0.01" placeholder="0.00" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      type="number"
+                      step="0.01"
+                      value={formData.transport_allowance}
+                      onChange={handleInputChange}
+                      placeholder="0.00"
                     />
+                  </div>
 
-                    <FormField
-                      control={form.control}
+                  <div>
+                    <label className="text-sm font-medium">Medical Allowance</label>
+                    <Input
                       name="medical_allowance"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Medical Allowance</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="number" step="0.01" placeholder="0.00" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      type="number"
+                      step="0.01"
+                      value={formData.medical_allowance}
+                      onChange={handleInputChange}
+                      placeholder="0.00"
                     />
+                  </div>
 
-                    <FormField
-                      control={form.control}
+                  <div>
+                    <label className="text-sm font-medium">Special Allowance</label>
+                    <Input
                       name="special_allowance"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Special Allowance</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="number" step="0.01" placeholder="0.00" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      type="number"
+                      step="0.01"
+                      value={formData.special_allowance}
+                      onChange={handleInputChange}
+                      placeholder="0.00"
                     />
+                  </div>
 
-                    <FormField
-                      control={form.control}
+                  <div>
+                    <label className="text-sm font-medium">Other Allowances</label>
+                    <Input
                       name="other_allowances"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Other Allowances</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="number" step="0.01" placeholder="0.00" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      type="number"
+                      step="0.01"
+                      value={formData.other_allowances}
+                      onChange={handleInputChange}
+                      placeholder="0.00"
                     />
                   </div>
+                </div>
 
-                  <FormField
-                    control={form.control}
+                <div>
+                  <label className="text-sm font-medium">Effective From</label>
+                  <Input
                     name="effective_from"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Effective From</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="date" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    type="date"
+                    value={formData.effective_from}
+                    onChange={handleInputChange}
                   />
+                </div>
 
-                  <div className="flex justify-end gap-2">
-                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={saveMutation.isPending}>
-                      {saveMutation.isPending ? "Saving..." : "Save"}
-                    </Button>
-                  </div>
-                </form>
-              </Form>
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSubmit} disabled={isSaving}>
+                    {isSaving ? "Saving..." : "Save"}
+                  </Button>
+                </div>
+              </div>
             </DialogContent>
           </Dialog>
         </div>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Employee ID</TableHead>
-                <TableHead>Basic</TableHead>
-                <TableHead>HRA</TableHead>
-                <TableHead>Transport</TableHead>
-                <TableHead>Medical</TableHead>
-                <TableHead>Special</TableHead>
-                <TableHead>Other</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Effective From</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {structures?.map((structure) => (
-                <TableRow key={structure.id}>
-                  <TableCell>{structure.employee_id}</TableCell>
-                  <TableCell>₹{structure.basic_salary}</TableCell>
-                  <TableCell>₹{structure.hra}</TableCell>
-                  <TableCell>₹{structure.transport_allowance}</TableCell>
-                  <TableCell>₹{structure.medical_allowance}</TableCell>
-                  <TableCell>₹{structure.special_allowance}</TableCell>
-                  <TableCell>₹{structure.other_allowances}</TableCell>
-                  <TableCell className="font-semibold">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left p-2 font-medium">Employee ID</th>
+                <th className="text-left p-2 font-medium">Basic</th>
+                <th className="text-left p-2 font-medium">HRA</th>
+                <th className="text-left p-2 font-medium">Transport</th>
+                <th className="text-left p-2 font-medium">Medical</th>
+                <th className="text-left p-2 font-medium">Special</th>
+                <th className="text-left p-2 font-medium">Other</th>
+                <th className="text-left p-2 font-medium">Total</th>
+                <th className="text-left p-2 font-medium">Effective From</th>
+                <th className="text-left p-2 font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {structures.map((structure) => (
+                <tr key={structure.id} className="border-b">
+                  <td className="p-2">{structure.employee_id}</td>
+                  <td className="p-2">₹{structure.basic_salary}</td>
+                  <td className="p-2">₹{structure.hra}</td>
+                  <td className="p-2">₹{structure.transport_allowance}</td>
+                  <td className="p-2">₹{structure.medical_allowance}</td>
+                  <td className="p-2">₹{structure.special_allowance}</td>
+                  <td className="p-2">₹{structure.other_allowances}</td>
+                  <td className="p-2 font-semibold">
                     ₹{calculateTotal(structure).toFixed(2)}
-                  </TableCell>
-                  <TableCell>{format(new Date(structure.effective_from), "PP")}</TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="p-2">{formatDate(structure.effective_from)}</td>
+                  <td className="p-2">
                     <div className="flex gap-2">
                       <Button
                         variant="ghost"
@@ -327,17 +355,17 @@ export default function SalaryStructure() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => deleteMutation.mutate(structure.id)}
+                        onClick={() => handleDelete(structure.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ))}
-            </TableBody>
-          </Table>
-        )}
+            </tbody>
+          </table>
+        </div>
       </CardContent>
     </Card>
   );

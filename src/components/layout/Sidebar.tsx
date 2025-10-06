@@ -37,18 +37,18 @@ const navigationItems = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
   { title: "Employee Management", url: "/employees", icon: Users },
   { title: "Organization Structure", url: "/organization", icon: Building2 },
-  { title: "Attendance & Time", url: "/attendance", icon: Clock },
-  { title: "Leave Management", url: "/leaves", icon: Calendar },
-  { title: "Payroll Management", url: "/payroll", icon: DollarSign },
-  { title: "Recruitment", url: "/recruitment", icon: UserCheck },
-  { title: "Performance", url: "/performance", icon: TrendingUp },
+  // { title: "Attendance & Time", url: "/attendance", icon: Clock },
+  // { title: "Leave Management", url: "/leaves", icon: Calendar },
+  // { title: "Payroll Management", url: "/payroll", icon: DollarSign },
+  // { title: "Recruitment", url: "/recruitment", icon: UserCheck },
+  // { title: "Performance", url: "/performance", icon: TrendingUp },
   { title: "Training", url: "/training", icon: GraduationCap },
   { title: "Employee Portal", url: "/portal", icon: Settings },
   { title: "Analytics & Reports", url: "/analytics", icon: BarChart3 },
   { title: "Integrations", url: "/integrations", icon: Settings },
   { title: "Expenses", url: "/expenses", icon: Receipt },
   { title: "Compliance", url: "/compliance", icon: FileText },
-  { title: "Exit Management", url: "/exit", icon: LogOut },
+  // { title: "Exit Management", url: "/exit", icon: LogOut },
 ];
 
 export function HRMSSidebar() {
@@ -84,7 +84,7 @@ export function HRMSSidebar() {
             </h1>
           </div>
         )}
-        <SidebarTrigger className="ml-auto hover:bg-[#e0f2fe] hover:text-[#1e293b] transition-all duration-300 hover:scale-[1.02]" />
+        <SidebarTrigger className="ml-auto px-3 py-2 rounded-md bg-gradient-to-r from-[#e0f2fe] to-[#bae6fd] text-[#0f172a] font-medium shadow-md hover:from-[#bae6fd] hover:to-[#7dd3fc] hover:text-[#0c4a6e] hover:shadow-lg border border-[#e0f2fe] transition-all duration-300 ease-in-out transform hover:scale-[1.05] active:scale-[0.98]" />
       </div>
 
       <SidebarContent className="py-4">

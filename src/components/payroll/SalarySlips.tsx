@@ -1,43 +1,148 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FileText, Download } from "lucide-react";
-import { format } from "date-fns";
-import { toast } from "sonner";
+
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+};
+
+const formatFullDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+};
+
+const formatMonthYear = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+};
+
+// Hardcoded transactions data
+const hardcodedTransactions = [
+  {
+    id: 1,
+    employee_id: "EMP001",
+    salary_month: "2025-09-01",
+    basic_salary: 30000,
+    hra: 12000,
+    transport_allowance: 3000,
+    medical_allowance: 2000,
+    special_allowance: 5000,
+    other_allowances: 3000,
+    overtime_amount: 500,
+    bonus_amount: 2000,
+    gross_salary: 57500,
+    tds: 3000,
+    pf: 3600,
+    esi: 550,
+    professional_tax: 200,
+    gratuity: 1440,
+    other_deductions: 0,
+    leave_deductions: 0,
+    total_deductions: 8790,
+    net_salary: 48710,
+    payment_status: "paid",
+    payment_date: "2025-09-05",
+    notes: "Regular monthly salary"
+  },
+  {
+    id: 2,
+    employee_id: "EMP002",
+    salary_month: "2025-09-01",
+    basic_salary: 40000,
+    hra: 16000,
+    transport_allowance: 4000,
+    medical_allowance: 2500,
+    special_allowance: 7000,
+    other_allowances: 4000,
+    overtime_amount: 1000,
+    bonus_amount: 3000,
+    gross_salary: 77500,
+    tds: 5000,
+    pf: 4800,
+    esi: 730,
+    professional_tax: 200,
+    gratuity: 1920,
+    other_deductions: 0,
+    leave_deductions: 0,
+    total_deductions: 12650,
+    net_salary: 64850,
+    payment_status: "pending",
+    payment_date: null,
+    notes: ""
+  },
+  {
+    id: 3,
+    employee_id: "EMP003",
+    salary_month: "2025-08-01",
+    basic_salary: 50000,
+    hra: 20000,
+    transport_allowance: 5000,
+    medical_allowance: 3000,
+    special_allowance: 9000,
+    other_allowances: 5000,
+    overtime_amount: 1500,
+    bonus_amount: 5000,
+    gross_salary: 98500,
+    tds: 7500,
+    pf: 6000,
+    esi: 920,
+    professional_tax: 200,
+    gratuity: 2400,
+    other_deductions: 0,
+    leave_deductions: 1833.33,
+    total_deductions: 18853.33,
+    net_salary: 79646.67,
+    payment_status: "paid",
+    payment_date: "2025-08-05",
+    notes: "Includes performance bonus"
+  },
+  {
+    id: 4,
+    employee_id: "EMP001",
+    salary_month: "2025-08-01",
+    basic_salary: 30000,
+    hra: 12000,
+    transport_allowance: 3000,
+    medical_allowance: 2000,
+    special_allowance: 5000,
+    other_allowances: 3000,
+    overtime_amount: 0,
+    bonus_amount: 0,
+    gross_salary: 55000,
+    tds: 3000,
+    pf: 3600,
+    esi: 550,
+    professional_tax: 200,
+    gratuity: 1440,
+    other_deductions: 0,
+    leave_deductions: 0,
+    total_deductions: 8790,
+    net_salary: 46210,
+    payment_status: "paid",
+    payment_date: "2025-08-05",
+    notes: ""
+  }
+];
 
 export default function SalarySlips() {
-  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [transactions] = useState(hardcodedTransactions);
 
-  const { data: transactions, isLoading } = useQuery({
-    queryKey: ["salary-transactions-slips"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("salary_transactions")
-        .select("*")
-        .order("salary_month", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const handlePreview = (transaction: any) => {
+  const handlePreview = (transaction) => {
     setSelectedTransaction(transaction);
     setIsPreviewOpen(true);
   };
 
-  const handleDownloadPDF = (transaction: any) => {
-    // In a real application, you would generate a proper PDF here
-    toast.info("PDF download functionality would be implemented here");
+  const handleDownloadPDF = (transaction) => {
+    alert("PDF download functionality would be implemented here");
   };
 
-  const handleDownloadExcel = (transaction: any) => {
-    // In a real application, you would generate an Excel file here
-    toast.info("Excel download functionality would be implemented here");
+  const handleDownloadExcel = (transaction) => {
+    alert("Excel download functionality would be implemented here");
   };
 
   return (
@@ -52,26 +157,24 @@ export default function SalarySlips() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Employee ID</TableHead>
-                <TableHead>Month</TableHead>
-                <TableHead>Net Salary</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {transactions?.map((transaction) => (
-                <TableRow key={transaction.id}>
-                  <TableCell>{transaction.employee_id}</TableCell>
-                  <TableCell>{format(new Date(transaction.salary_month), "MMM yyyy")}</TableCell>
-                  <TableCell className="font-semibold">₹{transaction.net_salary.toFixed(2)}</TableCell>
-                  <TableCell>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left p-2 font-medium">Employee ID</th>
+                <th className="text-left p-2 font-medium">Month</th>
+                <th className="text-left p-2 font-medium">Net Salary</th>
+                <th className="text-left p-2 font-medium">Status</th>
+                <th className="text-left p-2 font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.map((transaction) => (
+                <tr key={transaction.id} className="border-b">
+                  <td className="p-2">{transaction.employee_id}</td>
+                  <td className="p-2">{formatDate(transaction.salary_month)}</td>
+                  <td className="p-2 font-semibold">₹{transaction.net_salary.toFixed(2)}</td>
+                  <td className="p-2">
                     <span className={`px-2 py-1 rounded text-xs ${
                       transaction.payment_status === "paid" 
                         ? "bg-green-100 text-green-800" 
@@ -79,8 +182,8 @@ export default function SalarySlips() {
                     }`}>
                       {transaction.payment_status}
                     </span>
-                  </TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="p-2">
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
@@ -107,12 +210,12 @@ export default function SalarySlips() {
                         Excel
                       </Button>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ))}
-            </TableBody>
-          </Table>
-        )}
+            </tbody>
+          </table>
+        </div>
 
         <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -123,21 +226,21 @@ export default function SalarySlips() {
               <div className="space-y-6 p-6 border rounded-lg">
                 <div className="text-center border-b pb-4">
                   <h2 className="text-2xl font-bold">Salary Slip</h2>
-                  <p className="text-muted-foreground">
-                    {format(new Date(selectedTransaction.salary_month), "MMMM yyyy")}
+                  <p className="text-gray-600">
+                    {formatMonthYear(selectedTransaction.salary_month)}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-muted-foreground">Employee ID</p>
+                    <p className="text-sm text-gray-600">Employee ID</p>
                     <p className="font-semibold">{selectedTransaction.employee_id}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Payment Date</p>
+                    <p className="text-sm text-gray-600">Payment Date</p>
                     <p className="font-semibold">
                       {selectedTransaction.payment_date 
-                        ? format(new Date(selectedTransaction.payment_date), "PP")
+                        ? formatFullDate(selectedTransaction.payment_date)
                         : "Pending"}
                     </p>
                   </div>
@@ -195,12 +298,12 @@ export default function SalarySlips() {
 
                 <div className="grid grid-cols-2 gap-2 font-bold text-lg border-t-2 pt-4">
                   <div>Net Salary:</div>
-                  <div className="text-right text-primary">₹{selectedTransaction.net_salary.toFixed(2)}</div>
+                  <div className="text-right text-blue-600">₹{selectedTransaction.net_salary.toFixed(2)}</div>
                 </div>
 
                 {selectedTransaction.notes && (
                   <div className="border-t pt-4">
-                    <p className="text-sm text-muted-foreground">Notes</p>
+                    <p className="text-sm text-gray-600">Notes</p>
                     <p className="text-sm">{selectedTransaction.notes}</p>
                   </div>
                 )}

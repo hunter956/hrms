@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,11 +23,51 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, Clock } from "lucide-react";
 
+// Hardcoded shifts data
+const initialShifts = [
+  {
+    id: "1",
+    name: "Morning Shift",
+    start_time: "09:00",
+    end_time: "17:00",
+    grace_period_minutes: 15,
+    description: "Standard morning shift for office staff",
+    created_at: "2025-10-01T00:00:00",
+  },
+  {
+    id: "2",
+    name: "Evening Shift",
+    start_time: "14:00",
+    end_time: "22:00",
+    grace_period_minutes: 10,
+    description: "Evening shift for customer support",
+    created_at: "2025-10-02T00:00:00",
+  },
+  {
+    id: "3",
+    name: "Night Shift",
+    start_time: "22:00",
+    end_time: "06:00",
+    grace_period_minutes: 20,
+    description: "Night shift for 24/7 operations",
+    created_at: "2025-10-03T00:00:00",
+  },
+  {
+    id: "4",
+    name: "Full Day",
+    start_time: "08:00",
+    end_time: "18:00",
+    grace_period_minutes: 15,
+    description: "Extended full day shift",
+    created_at: "2025-10-04T00:00:00",
+  },
+];
+
 export function ShiftManagement() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingShift, setEditingShift] = useState<any>(null);
+  const [shifts, setShifts] = useState(initialShifts);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -39,75 +77,53 @@ export function ShiftManagement() {
     description: "",
   });
 
-  const { data: shifts, isLoading } = useQuery({
-    queryKey: ["shifts"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("shifts")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
+  const isLoading = false;
 
-  const createMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase.from("shifts").insert(data);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({ title: "Success", description: "Shift created successfully" });
-      queryClient.invalidateQueries({ queryKey: ["shifts"] });
-      setIsDialogOpen(false);
-      resetForm();
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to create shift",
-        variant: "destructive",
-      });
-    },
-  });
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const newShift = {
+      id: Date.now().toString(),
+      name: formData.name,
+      start_time: formData.start_time,
+      end_time: formData.end_time,
+      grace_period_minutes: formData.grace_period_minutes,
+      description: formData.description,
+      created_at: new Date().toISOString(),
+    };
 
-  const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: typeof formData }) => {
-      const { error } = await supabase.from("shifts").update(data).eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({ title: "Success", description: "Shift updated successfully" });
-      queryClient.invalidateQueries({ queryKey: ["shifts"] });
-      setIsDialogOpen(false);
-      resetForm();
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to update shift",
-        variant: "destructive",
-      });
-    },
-  });
+    setShifts([newShift, ...shifts]);
+    toast({ title: "Success", description: "Shift created successfully" });
+    setIsDialogOpen(false);
+    resetForm();
+  };
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("shifts").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({ title: "Success", description: "Shift deleted successfully" });
-      queryClient.invalidateQueries({ queryKey: ["shifts"] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete shift",
-        variant: "destructive",
-      });
-    },
-  });
+  const handleUpdate = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    setShifts(
+      shifts.map((shift) =>
+        shift.id === editingShift.id
+          ? {
+              ...shift,
+              name: formData.name,
+              start_time: formData.start_time,
+              end_time: formData.end_time,
+              grace_period_minutes: formData.grace_period_minutes,
+              description: formData.description,
+            }
+          : shift
+      )
+    );
+    toast({ title: "Success", description: "Shift updated successfully" });
+    setIsDialogOpen(false);
+    resetForm();
+  };
+
+  const handleDelete = (id: string) => {
+    setShifts(shifts.filter((shift) => shift.id !== id));
+    toast({ title: "Success", description: "Shift deleted successfully" });
+  };
 
   const resetForm = () => {
     setFormData({
@@ -133,11 +149,10 @@ export function ShiftManagement() {
   };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
     if (editingShift) {
-      updateMutation.mutate({ id: editingShift.id, data: formData });
+      handleUpdate(e);
     } else {
-      createMutation.mutate(formData);
+      handleCreate(e);
     }
   };
 
@@ -155,7 +170,7 @@ export function ShiftManagement() {
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={resetForm}  className="px-6 py-3 h-auto">
+            <Button onClick={resetForm} className="px-6 py-3 h-auto">
               <Plus className="mr-2 h-4 w-4" />
               Add Shift
             </Button>
@@ -244,10 +259,7 @@ export function ShiftManagement() {
                 >
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={createMutation.isPending || updateMutation.isPending}
-                >
+                <Button type="submit">
                   {editingShift ? "Update" : "Create"}
                 </Button>
               </DialogFooter>
@@ -302,7 +314,7 @@ export function ShiftManagement() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => deleteMutation.mutate(shift.id)}
+                      onClick={() => handleDelete(shift.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

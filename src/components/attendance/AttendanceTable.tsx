@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -15,31 +13,113 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Search, Calendar } from "lucide-react";
 
+// Hardcoded attendance records
+const mockRecords = [
+  {
+    id: "1",
+    employee_id: "EMP001",
+    date: "2025-10-06",
+    check_in_time: "2025-10-06T09:00:00",
+    check_out_time: "2025-10-06T18:00:00",
+    status: "present",
+    overtime_hours: 0,
+    marking_method: "biometric",
+    notes: null,
+  },
+  {
+    id: "2",
+    employee_id: "EMP002",
+    date: "2025-10-06",
+    check_in_time: "2025-10-06T09:15:00",
+    check_out_time: "2025-10-06T18:30:00",
+    status: "late",
+    overtime_hours: 0.5,
+    marking_method: "biometric",
+    notes: "Arrived 15 minutes late",
+  },
+  {
+    id: "3",
+    employee_id: "EMP003",
+    date: "2025-10-06",
+    check_in_time: null,
+    check_out_time: null,
+    status: "absent",
+    overtime_hours: 0,
+    marking_method: "manual",
+    notes: "Unexcused absence",
+  },
+  {
+    id: "4",
+    employee_id: "EMP004",
+    date: "2025-10-06",
+    check_in_time: "2025-10-06T09:05:00",
+    check_out_time: "2025-10-06T20:00:00",
+    status: "present",
+    overtime_hours: 2,
+    marking_method: "biometric",
+    notes: "Working on urgent project",
+  },
+  {
+    id: "5",
+    employee_id: "EMP005",
+    date: "2025-10-06",
+    check_in_time: "2025-10-06T09:00:00",
+    check_out_time: "2025-10-06T13:00:00",
+    status: "half-day",
+    overtime_hours: 0,
+    marking_method: "manual",
+    notes: "Medical appointment",
+  },
+  {
+    id: "6",
+    employee_id: "EMP001",
+    date: "2025-10-05",
+    check_in_time: "2025-10-05T08:55:00",
+    check_out_time: "2025-10-05T17:30:00",
+    status: "present",
+    overtime_hours: 0,
+    marking_method: "biometric",
+    notes: null,
+  },
+  {
+    id: "7",
+    employee_id: "EMP006",
+    date: "2025-10-06",
+    check_in_time: null,
+    check_out_time: null,
+    status: "on-leave",
+    overtime_hours: 0,
+    marking_method: "manual",
+    notes: "Approved annual leave",
+  },
+  {
+    id: "8",
+    employee_id: "EMP007",
+    date: "2025-10-06",
+    check_in_time: "2025-10-06T09:20:00",
+    check_out_time: "2025-10-06T18:00:00",
+    status: "late",
+    overtime_hours: 0,
+    marking_method: "biometric",
+    notes: "Traffic delay",
+  },
+];
+
 export function AttendanceTable() {
   const [searchDate, setSearchDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [employeeSearch, setEmployeeSearch] = useState("");
 
-  const { data: records, isLoading } = useQuery({
-    queryKey: ["attendance-records", searchDate, employeeSearch],
-    queryFn: async () => {
-      let query = supabase
-        .from("attendance_records")
-        .select("*")
-        .order("date", { ascending: false });
+  // Filter records based on search criteria
+  const records = useMemo(() => {
+    return mockRecords.filter((record) => {
+      const matchesDate = !searchDate || record.date === searchDate;
+      const matchesEmployee = !employeeSearch || 
+        record.employee_id.toLowerCase().includes(employeeSearch.toLowerCase());
+      return matchesDate && matchesEmployee;
+    });
+  }, [searchDate, employeeSearch]);
 
-      if (searchDate) {
-        query = query.eq("date", searchDate);
-      }
-
-      if (employeeSearch) {
-        query = query.ilike("employee_id", `%${employeeSearch}%`);
-      }
-
-      const { data, error } = await query.limit(100);
-      if (error) throw error;
-      return data;
-    },
-  });
+  const isLoading = false;
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive"> = {
