@@ -43,7 +43,8 @@ const TrainingParticipation = () => {
   ];
 
   return (
-    <Card>
+    <div className="max-w-5xl mx-auto">
+      <Card className="border-[#e2e8f0] bg-gradient-to-br from-white to-[#f9fafb] shadow-lg">
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
@@ -95,7 +96,8 @@ const TrainingParticipation = () => {
           </TableBody>
         </Table>
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
 

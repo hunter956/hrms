@@ -152,7 +152,7 @@ export function DesignationsTab() {
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
           >
             <Plus className="h-4 w-4" />
-            Add Designation
+                Add Designation
           </button>
         </div>
       </div>
@@ -224,39 +224,39 @@ export function DesignationsTab() {
             </div>
             
             <div className="p-6 space-y-4">
-              <div className="space-y-2">
+                <div className="space-y-2">
                 <label htmlFor="title" className="block text-sm font-medium text-slate-700">
                   Designation Title *
                 </label>
                 <input
-                  id="title"
+                    id="title"
                   type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
+                  />
+                </div>
               
-              <div className="space-y-2">
+                <div className="space-y-2">
                 <label htmlFor="description" className="block text-sm font-medium text-slate-700">
                   Description
                 </label>
                 <textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                />
-              </div>
+                  />
+                </div>
               
-              <div className="space-y-2">
+                <div className="space-y-2">
                 <label htmlFor="level" className="block text-sm font-medium text-slate-700">
                   Hierarchy Level
                 </label>
                 <select
                   id="level"
-                  value={formData.level}
+                    value={formData.level}
                   onChange={(e) => setFormData({ ...formData, level: e.target.value })}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
@@ -266,26 +266,26 @@ export function DesignationsTab() {
                   <option value="4">Level 4 - Junior Management</option>
                   <option value="5">Level 5 - Staff</option>
                 </select>
-              </div>
+                </div>
               
-              <div className="space-y-2">
+                <div className="space-y-2">
                 <label htmlFor="department" className="block text-sm font-medium text-slate-700">
                   Department
                 </label>
                 <select
                   id="department"
-                  value={formData.department_id}
+                    value={formData.department_id}
                   onChange={(e) => setFormData({ ...formData, department_id: e.target.value })}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">None</option>
                   {initialDepartments.map((dept) => (
                     <option key={dept.id} value={dept.id}>
-                      {dept.name}
+                          {dept.name}
                     </option>
-                  ))}
+                      ))}
                 </select>
-              </div>
+                </div>
               
               <div className="flex justify-end gap-2 pt-4">
                 <button
@@ -293,7 +293,7 @@ export function DesignationsTab() {
                   onClick={() => setIsOpen(false)}
                   className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
                 >
-                  Cancel
+                    Cancel
                 </button>
                 <button
                   type="button"
@@ -301,7 +301,7 @@ export function DesignationsTab() {
                   disabled={!formData.title}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {editingId ? "Update" : "Create"}
+                    {editingId ? "Update" : "Create"}
                 </button>
               </div>
             </div>
@@ -313,8 +313,8 @@ export function DesignationsTab() {
       {toast && (
         <div className="fixed bottom-4 right-4 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg animate-in slide-in-from-bottom duration-300 z-50">
           {toast}
-        </div>
+                </div>
       )}
-    </div>
+        </div>
   );
 }

@@ -101,7 +101,7 @@ export function DepartmentsTab() {
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
           >
             <Plus className="h-4 w-4" />
-            Add Department
+                Add Department
           </button>
         </div>
       </div>
@@ -167,50 +167,50 @@ export function DepartmentsTab() {
             </div>
             
             <div className="p-6 space-y-4">
-              <div className="space-y-2">
+                <div className="space-y-2">
                 <label htmlFor="name" className="block text-sm font-medium text-slate-700">
                   Department Name *
                 </label>
                 <input
-                  id="name"
+                    id="name"
                   type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
+                  />
+                </div>
               
-              <div className="space-y-2">
+                <div className="space-y-2">
                 <label htmlFor="description" className="block text-sm font-medium text-slate-700">
                   Description
                 </label>
                 <textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                />
-              </div>
+                  />
+                </div>
               
-              <div className="space-y-2">
+                <div className="space-y-2">
                 <label htmlFor="parent" className="block text-sm font-medium text-slate-700">
                   Parent Department
                 </label>
                 <select
                   id="parent"
-                  value={formData.parent_department_id}
+                    value={formData.parent_department_id}
                   onChange={(e) => setFormData({ ...formData, parent_department_id: e.target.value })}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">None</option>
                   {departments.filter(d => d.id !== editingId).map((dept) => (
                     <option key={dept.id} value={dept.id}>
-                      {dept.name}
+                          {dept.name}
                     </option>
-                  ))}
+                      ))}
                 </select>
-              </div>
+                </div>
               
               <div className="flex justify-end gap-2 pt-4">
                 <button
@@ -218,7 +218,7 @@ export function DepartmentsTab() {
                   onClick={() => setIsOpen(false)}
                   className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
                 >
-                  Cancel
+                    Cancel
                 </button>
                 <button
                   type="button"
@@ -226,7 +226,7 @@ export function DepartmentsTab() {
                   disabled={!formData.name}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {editingId ? "Update" : "Create"}
+                    {editingId ? "Update" : "Create"}
                 </button>
               </div>
             </div>
@@ -238,8 +238,8 @@ export function DepartmentsTab() {
       {toast && (
         <div className="fixed bottom-4 right-4 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg animate-in slide-in-from-bottom duration-300 z-50">
           {toast}
-        </div>
+                </div>
       )}
-    </div>
+        </div>
   );
 }

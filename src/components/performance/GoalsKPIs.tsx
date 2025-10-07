@@ -11,20 +11,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Target } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
-export function GoalsKPIs() {
+export const GoalsKPIs = () => {
   const [showForm, setShowForm] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState(null);
 
   const goals = [
     {
@@ -59,8 +71,8 @@ export function GoalsKPIs() {
     },
   ];
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive"> = {
+  const getStatusBadge = (status) => {
+    const variants = {
       "on-track": "default",
       "at-risk": "destructive",
       completed: "secondary",
@@ -72,20 +84,36 @@ export function GoalsKPIs() {
     );
   };
 
+  const handleEdit = (goal) => {
+    setSelectedGoal(goal);
+    setEditDialogOpen(true);
+  };
+
+  const handleDelete = (goal) => {
+    setSelectedGoal(goal);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    console.log("Deleting goal:", selectedGoal?.id);
+    setDeleteDialogOpen(false);
+    setSelectedGoal(null);
+  };
+
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-primary" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+      <Card className="shadow-lg">
+        <CardHeader className="flex flex-row items-center justify-between border-b">
+          <CardTitle className="flex items-center gap-2 text-2xl">
+            <Target className="h-6 w-6 text-blue-600" />
             Goals & KPIs
           </CardTitle>
-          <Button onClick={() => setShowForm(!showForm)}  className="px-6 py-3 h-auto">
+          <Button onClick={() => setShowForm(!showForm)} className="px-6 py-3 h-auto">
             <Plus className="h-4 w-4 mr-2" />
             Add Goal
           </Button>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {showForm && (
             <div className="border rounded-lg p-6 mb-6 space-y-4 bg-muted/50">
               <div className="grid grid-cols-2 gap-4">
@@ -144,57 +172,159 @@ export function GoalsKPIs() {
             </div>
           )}
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Employee</TableHead>
-                <TableHead>Goal Title</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Target Date</TableHead>
-                <TableHead>Progress</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {goals.map((goal) => (
-                <TableRow key={goal.id}>
-                  <TableCell className="font-medium">{goal.employee}</TableCell>
-                  <TableCell>
-                    <div>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="text-left p-4 font-semibold">Employee</th>
+                  <th className="text-left p-4 font-semibold">Goal Title</th>
+                  <th className="text-left p-4 font-semibold">Category</th>
+                  <th className="text-left p-4 font-semibold">Target Date</th>
+                  <th className="text-left p-4 font-semibold">Progress</th>
+                  <th className="text-left p-4 font-semibold">Status</th>
+                  <th className="text-left p-4 font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {goals.map((goal) => (
+                  <tr key={goal.id} className="border-b hover:bg-muted/30 transition-colors">
+                    <td className="p-4 font-medium">{goal.employee}</td>
+                    <td className="p-4">
                       <div className="font-medium">{goal.title}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {goal.description}
+                      <div className="text-sm text-muted-foreground">{goal.description}</div>
+                    </td>
+                    <td className="p-4">{goal.category}</td>
+                    <td className="p-4">{goal.targetDate}</td>
+                    <td className="p-4">
+                      <div className="space-y-1">
+                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-blue-600 h-2 rounded-full transition-all"
+                            style={{ width: `${goal.progress}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-muted-foreground">{goal.progress}%</span>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{goal.category}</TableCell>
-                  <TableCell>{goal.targetDate}</TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <Progress value={goal.progress} className="w-24" />
-                      <span className="text-xs text-muted-foreground">
-                        {goal.progress}%
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(goal.status)}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="icon">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    </td>
+                    <td className="p-4">{getStatusBadge(goal.status)}</td>
+                    <td className="p-4">
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="icon" onClick={() => handleEdit(goal)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(goal)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
+
+      {/* Edit Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Goal</DialogTitle>
+            <DialogDescription>
+              Update the goal details below.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Employee</Label>
+                <Select defaultValue={selectedGoal?.employee}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select employee" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="John Doe">John Doe</SelectItem>
+                    <SelectItem value="Jane Smith">Jane Smith</SelectItem>
+                    <SelectItem value="Mike Johnson">Mike Johnson</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Category</Label>
+                <Select defaultValue={selectedGoal?.category}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Sales">Sales</SelectItem>
+                    <SelectItem value="Professional Development">Professional Development</SelectItem>
+                    <SelectItem value="Customer Success">Customer Success</SelectItem>
+                    <SelectItem value="Operations">Operations</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Goal Title</Label>
+              <Input defaultValue={selectedGoal?.title} placeholder="Enter goal title" />
+            </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Textarea defaultValue={selectedGoal?.description} placeholder="Describe the goal in detail" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Target Date</Label>
+                <Input type="date" defaultValue={selectedGoal?.targetDate} />
+              </div>
+              <div className="space-y-2">
+                <Label>Progress (%)</Label>
+                <Input type="number" defaultValue={selectedGoal?.progress} placeholder="0" min="0" max="100" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select defaultValue={selectedGoal?.status}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="on-track">On Track</SelectItem>
+                  <SelectItem value="at-risk">At Risk</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => setEditDialogOpen(false)}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the goal "{selectedGoal?.title}" for {selectedGoal?.employee}. 
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
