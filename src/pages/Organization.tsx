@@ -8,7 +8,7 @@ import { HierarchyTab } from "@/components/organization/HierarchyTab";
 
 export default function Organization() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-6xl mx-auto">
       <div>
         <h1 className="text-3xl font-bold text-[#1e293b]">
           Organization Structure
