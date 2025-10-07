@@ -7,7 +7,7 @@ import CertificationCompliance from "@/components/training/CertificationComplian
 
 const Training = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-6xl mx-auto">
       <div>
         <h1 className="text-3xl font-bold text-[#1e293b]">Training & Development</h1>
         <p className="text-[#64748b]">
