@@ -1,15 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Plus, Pencil, Trash2, X } from "lucide-react";
 
 const initialDepartments = [
   { id: "1", name: "Operations" },
@@ -65,7 +55,7 @@ const initialDesignations = [
 
 export function DesignationsTab() {
   const [isOpen, setIsOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState(null);
   const [designations, setDesignations] = useState(initialDesignations);
   const [formData, setFormData] = useState({
     title: "",
@@ -73,15 +63,21 @@ export function DesignationsTab() {
     level: "1",
     department_id: "",
   });
-  const { toast } = useToast();
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message) => {
+    setToast(message);
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const resetForm = () => {
     setFormData({ title: "", description: "", level: "1", department_id: "" });
     setEditingId(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = () => {
+    if (!formData.title) return;
+    
     if (editingId) {
       setDesignations(designations.map(designation => 
         designation.id === editingId 
@@ -94,7 +90,7 @@ export function DesignationsTab() {
             }
           : designation
       ));
-      toast({ title: "Designation updated successfully" });
+      showToast("Designation updated successfully");
     } else {
       const newDesignation = {
         id: String(Date.now()),
@@ -104,13 +100,13 @@ export function DesignationsTab() {
         department_id: formData.department_id || null,
       };
       setDesignations([...designations, newDesignation]);
-      toast({ title: "Designation created successfully" });
+      showToast("Designation created successfully");
     }
     setIsOpen(false);
     resetForm();
   };
 
-  const handleEdit = (designation: any) => {
+  const handleEdit = (designation) => {
     setFormData({
       title: designation.title,
       description: designation.description || "",
@@ -121,146 +117,204 @@ export function DesignationsTab() {
     setIsOpen(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id) => {
     setDesignations(designations.filter(designation => designation.id !== id));
-    toast({ title: "Designation deleted successfully" });
+    showToast("Designation deleted successfully");
   };
 
-  const getLevelBadgeVariant = (level: number) => {
-    if (level <= 2) return "default";
-    if (level <= 5) return "secondary";
-    return "destructive";
+  const getLevelBadgeColor = (level) => {
+    if (level <= 2) return "bg-blue-100 text-blue-800";
+    if (level <= 4) return "bg-green-100 text-green-800";
+    return "bg-gray-100 text-gray-800";
+  };
+
+  const getLevelLabel = (level) => {
+    const labels = {
+      1: "Executive",
+      2: "Senior Management",
+      3: "Middle Management",
+      4: "Junior Management",
+      5: "Staff"
+    };
+    return labels[level] || `Level ${level}`;
   };
 
   return (
-    <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-elevated">
-      <CardHeader className="border-b border-border/50 bg-gradient-primary/5">
+    <div className="bg-white rounded-lg shadow-lg border border-slate-200">
+      <div className="border-b border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4">
         <div className="flex items-center justify-between">
-          <CardTitle>Designations & Roles</CardTitle>
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={resetForm} className="px-6 py-3 h-auto">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Designation
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{editingId ? "Edit Designation" : "Add New Designation"}</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Designation Title *</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="level">Hierarchy Level</Label>
-                  <Select
-                    value={formData.level}
-                    onValueChange={(value) => setFormData({ ...formData, level: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Level 1 - Executive</SelectItem>
-                      <SelectItem value="2">Level 2 - Senior Management</SelectItem>
-                      <SelectItem value="3">Level 3 - Middle Management</SelectItem>
-                      <SelectItem value="4">Level 4 - Junior Management</SelectItem>
-                      <SelectItem value="5">Level 5 - Staff</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="department">Department</Label>
-                  <Select
-                    value={formData.department_id}
-                    onValueChange={(value) => setFormData({ ...formData, department_id: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select department (optional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">None</SelectItem>
-                      {initialDepartments?.map((dept) => (
-                        <SelectItem key={dept.id} value={dept.id}>
-                          {dept.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex justify-end gap-2">
-                  <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" className="bg-gradient-primary">
-                    {editingId ? "Update" : "Create"}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+          <h2 className="text-2xl font-bold text-slate-800">Designations & Roles</h2>
+          <button
+            onClick={() => {
+              resetForm();
+              setIsOpen(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+          >
+            <Plus className="h-4 w-4" />
+            Add Designation
+          </button>
         </div>
-      </CardHeader>
-      <CardContent className="pt-6">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Level</TableHead>
-              <TableHead>Department</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {designations?.map((designation) => (
-              <TableRow key={designation.id}>
-                <TableCell className="font-medium">{designation.title}</TableCell>
-                <TableCell>{designation.description || "-"}</TableCell>
-                <TableCell>
-                  <Badge variant={getLevelBadgeVariant(designation.level)}>
-                    Level {designation.level}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {initialDepartments.find(d => d.id === designation.department_id)?.name || "-"}
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleEdit(designation)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(designation.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+      </div>
+      
+      <div className="p-6">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-slate-200">
+                <th className="text-left py-3 px-4 font-semibold text-slate-700">Title</th>
+                <th className="text-left py-3 px-4 font-semibold text-slate-700">Description</th>
+                <th className="text-left py-3 px-4 font-semibold text-slate-700">Level</th>
+                <th className="text-left py-3 px-4 font-semibold text-slate-700">Department</th>
+                <th className="text-right py-3 px-4 font-semibold text-slate-700">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {designations.map((designation) => (
+                <tr key={designation.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                  <td className="py-3 px-4 font-medium text-slate-800">{designation.title}</td>
+                  <td className="py-3 px-4 text-slate-600">{designation.description || "-"}</td>
+                  <td className="py-3 px-4">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getLevelBadgeColor(designation.level)}`}>
+                      Level {designation.level} - {getLevelLabel(designation.level)}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-slate-600">
+                    {initialDepartments.find(d => d.id === designation.department_id)?.name || "-"}
+                  </td>
+                  <td className="py-3 px-4 text-right">
+                    <button
+                      onClick={() => handleEdit(designation)}
+                      className="inline-flex items-center justify-center p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors mr-2"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(designation.id)}
+                      className="inline-flex items-center justify-center p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modal */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="relative bg-white rounded-lg shadow-2xl w-full max-w-md mx-4 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-slate-200">
+              <h3 className="text-xl font-semibold text-slate-800">
+                {editingId ? "Edit Designation" : "Add New Designation"}
+              </h3>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-1 hover:bg-slate-100 rounded transition-colors"
+              >
+                <X className="h-5 w-5 text-slate-500" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="title" className="block text-sm font-medium text-slate-700">
+                  Designation Title *
+                </label>
+                <input
+                  id="title"
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="description" className="block text-sm font-medium text-slate-700">
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="level" className="block text-sm font-medium text-slate-700">
+                  Hierarchy Level
+                </label>
+                <select
+                  id="level"
+                  value={formData.level}
+                  onChange={(e) => setFormData({ ...formData, level: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="1">Level 1 - Executive</option>
+                  <option value="2">Level 2 - Senior Management</option>
+                  <option value="3">Level 3 - Middle Management</option>
+                  <option value="4">Level 4 - Junior Management</option>
+                  <option value="5">Level 5 - Staff</option>
+                </select>
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="department" className="block text-sm font-medium text-slate-700">
+                  Department
+                </label>
+                <select
+                  id="department"
+                  value={formData.department_id}
+                  onChange={(e) => setFormData({ ...formData, department_id: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">None</option>
+                  {initialDepartments.map((dept) => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="flex justify-end gap-2 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={!formData.title}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {editingId ? "Update" : "Create"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast */}
+      {toast && (
+        <div className="fixed bottom-4 right-4 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg animate-in slide-in-from-bottom duration-300 z-50">
+          {toast}
+        </div>
+      )}
+    </div>
   );
 }
