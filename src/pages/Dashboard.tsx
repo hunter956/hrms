@@ -85,10 +85,12 @@ export default function Dashboard() {
                 View Payslip
               </Button>
             </Link>
-            <Button variant="secondary" className="px-6 py-3 bg-[#0ea5e9] text-white hover:bg-[#0284c7] transition-all duration-300">
-              <Clock className="mr-2 h-4 w-4" />
-              Clock In
-            </Button>
+            <Link to="/attendance">
+              <Button variant="secondary" className="px-6 py-3 bg-[#0ea5e9] text-white hover:bg-[#0284c7] transition-all duration-300">
+                <Clock className="mr-2 h-4 w-4" />
+                Clock In
+              </Button>
+            </Link>
           </div>
         </div>
         
