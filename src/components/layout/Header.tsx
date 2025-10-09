@@ -15,6 +15,10 @@ import { Badge } from "@/components/ui/badge";
 
 export function Header() {
   const navigate = useNavigate();
+  const handleSignOut = () => {
+    localStorage.removeItem("authToken"); 
+    navigate("/login"); 
+  };
   return (
     <header className="flex h-16 items-center justify-between border-b border-[#e2e8f0] bg-[#f9fafb] backdrop-blur-sm px-6 shadow-elevated sticky top-0 z-40">
       <div className="flex items-center gap-4 flex-1">
@@ -68,7 +72,7 @@ export function Header() {
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem className="text-destructive" onClick={handleSignOut}>
               Sign Out
             </DropdownMenuItem>
           </DropdownMenuContent>
