@@ -1,10 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar, ArrowLeft } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 
 export default function Leaves() {
+  const navigate = useNavigate();
+
   const kpis = [
     { label: "Total Employees", value: 86 },
     { label: "On Leave Today", value: 7 },
@@ -27,6 +31,16 @@ export default function Leaves() {
 
   return (
     <div className="space-y-6">
+      {/* Back Button */}
+      <Button 
+        variant="outline" 
+        className="flex items-center gap-2"
+        onClick={() => navigate('/employees')}
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Employee Management
+      </Button>
+
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-[#1e293b]">Leave Management</h1>
         <p className="text-[#64748b] mt-2">

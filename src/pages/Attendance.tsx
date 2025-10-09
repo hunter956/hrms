@@ -1,15 +1,29 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { AttendanceMarking } from "@/components/attendance/AttendanceMarking";
 import { AttendanceTable } from "@/components/attendance/AttendanceTable";
 import { ShiftManagement } from "@/components/attendance/ShiftManagement";
 import { RosterManagement } from "@/components/attendance/RosterManagement";
 import { AttendanceStats } from "@/components/attendance/AttendanceStats";
-import { Calendar, Clock, Users, BarChart3 } from "lucide-react";
+import { Calendar, Clock, Users, BarChart3, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Attendance() {
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-6">
+      {/* Back Button */}
+      <Button 
+        variant="outline" 
+        className="flex items-center gap-2"
+        onClick={() => navigate('/employees')}
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Employee Management
+      </Button>
+
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-[#1e293b]">Attendance & Time Tracking</h1>
         <p className="text-[#64748b] mt-2">
