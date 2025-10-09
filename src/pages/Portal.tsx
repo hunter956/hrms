@@ -58,14 +58,21 @@ export default function Portal() {
 
       <Tabs defaultValue="leave-apply" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 lg:w-auto">
-          <TabsTrigger value="leave-apply">Apply Leave</TabsTrigger>
-          <TabsTrigger value="attendance">Attendance</TabsTrigger>
-          <TabsTrigger value="payslips">Payslips</TabsTrigger>
-          <TabsTrigger value="expenses">Expenses</TabsTrigger>
           <TabsTrigger value="profile">Update Profile</TabsTrigger>
+          <TabsTrigger value="payslips">Payslips</TabsTrigger>
+          <TabsTrigger value="attendance">Attendance</TabsTrigger>
+          <TabsTrigger value="leave-apply">Apply Leave</TabsTrigger>
+
           {(isManager || isAdmin) && (
             <>
               <TabsTrigger value="leave-approval">Approve Leaves</TabsTrigger>
+            </>
+          )}
+
+          <TabsTrigger value="expenses">Expenses</TabsTrigger>
+
+          {(isManager || isAdmin) && (
+            <>
               <TabsTrigger value="expense-approval">Approve Expenses</TabsTrigger>
             </>
           )}

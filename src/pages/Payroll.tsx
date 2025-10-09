@@ -1,12 +1,27 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import SalaryStructure from "@/components/payroll/SalaryStructure";
 import SalaryCalculation from "@/components/payroll/SalaryCalculation";
 import SalarySlips from "@/components/payroll/SalarySlips";
 import TaxDeductions from "@/components/payroll/TaxDeductions";
 
 export default function Payroll() {
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-6">
+      {/* Back Button */}
+      <Button 
+        variant="outline" 
+        className="flex items-center gap-2"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Employee Management
+      </Button>
+
       <header>
         <h1 className="text-3xl font-bold text-[#1e293b]">
           Payroll Management

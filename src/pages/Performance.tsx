@@ -1,4 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { PerformanceStats } from "@/components/performance/PerformanceStats";
 import { GoalsKPIs } from "@/components/performance/GoalsKPIs";
 import { SelfAssessment } from "@/components/performance/SelfAssessment";
@@ -7,8 +10,20 @@ import { PerformanceRating } from "@/components/performance/PerformanceRating";
 import { PerformanceReports } from "@/components/performance/PerformanceReports";
 
 export default function Performance() {
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-6">
+      {/* Back Button */}
+      <Button 
+        variant="outline" 
+        className="flex items-center gap-2"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Employee Management
+      </Button>
+
       <div>
         <h1 className="text-3xl font-bold text-[#1e293b]">Performance Management</h1>
         <p className="text-[#64748b] mt-2">
