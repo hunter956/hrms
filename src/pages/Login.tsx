@@ -6,22 +6,80 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
+import { setAuthToken } from "@/lib/api"; 
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const API_BASE_URL = import.meta.env.VITE_USER_SERVICE_URL;
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
   });
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", formData);
-    // For demo purposes, navigate to dashboard
-    navigate("/");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signin`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData), 
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        toast({ 
+          title: "Login Failed", 
+          description: errorData?.message || "Please check your credentials.", 
+          variant: "destructive", 
+        });
+        return; 
+      }
+
+      const data = await response.json();
+      
+ 
+      if (!data.token) {
+        toast({ 
+          title: "Login Failed", 
+          description: "No authentication token received.", 
+          variant: "destructive", 
+        });
+        return;
+      }
+
+      console.log("Token received, length:", data.token.length);
+      
+
+      setAuthToken(data.token);
+      
+      toast({ 
+        title: "Login Successful", 
+        description: "Welcome back!", 
+        variant: "success", 
+        duration: 4000
+      });
+
+      setTimeout(() => {
+        navigate("/");
+      }, 100);
+
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({ 
+        title: "Error", 
+        description: "An unexpected error occurred. Please try again.", 
+        variant: "destructive", 
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,7 +91,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex w-full bg-gradient-to-br from-[#f9fafb] via-white to-[#f0f9ff] relative overflow-hidden">
-      {/* Background Pattern */}
+
       <div className="absolute inset-0 opacity-5">
         <div 
           className="absolute top-0 left-0 w-full h-full"
@@ -43,14 +101,14 @@ export default function Login() {
         ></div>
       </div>
 
-      {/* Decorative Elements */}
+
       <div className="absolute -top-4 -right-4 w-32 h-32 rounded-full bg-gradient-to-r from-[#2563eb]/10 to-[#0ea5e9]/10 blur-3xl"></div>
       <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-gradient-to-r from-[#0ea5e9]/10 to-[#2563eb]/10 blur-2xl"></div>
       <div className="absolute top-1/2 left-1/4 w-16 h-16 rounded-full bg-gradient-to-r from-[#2563eb]/5 to-[#0ea5e9]/5 blur-xl"></div>
 
       <div className="flex-1 flex items-center justify-center p-8 relative z-10">
         <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Side - Branding & Features */}
+
           <div className="space-y-8">
             <div className="space-y-6">
               <div className="flex items-center gap-4">
@@ -72,7 +130,7 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Feature Cards */}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="p-4 rounded-xl border border-[#e2e8f0] bg-gradient-to-br from-white to-[#f9fafb] shadow-sm hover:shadow-md transition-all duration-300">
                 <div className="flex items-center gap-3 mb-2">
@@ -115,7 +173,7 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Stats */}
+
             <div className="flex gap-6 pt-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-[#2563eb]">500+</div>
@@ -132,7 +190,7 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Right Side - Login Form */}
+
           <div className="flex justify-center lg:justify-end">
             <Card className="w-full max-w-md border-[#e2e8f0] bg-gradient-to-br from-white to-[#f9fafb] shadow-2xl">
               <CardHeader className="space-y-2 text-center pb-8">
@@ -148,14 +206,15 @@ export default function Login() {
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#64748b]" />
                       <Input
-                        id="email"
-                        name="email"
+                        id="username"
+                        name="username"
                         type="email"
                         placeholder="Enter your email"
-                        value={formData.email}
+                        value={formData.username}
                         onChange={handleInputChange}
                         className="pl-10 border-[#e2e8f0] focus:border-[#2563eb] focus:ring-[#2563eb]"
                         required
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
@@ -175,11 +234,13 @@ export default function Login() {
                         onChange={handleInputChange}
                         className="pl-10 pr-10 border-[#e2e8f0] focus:border-[#2563eb] focus:ring-[#2563eb]"
                         required
+                        disabled={isLoading}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#64748b] hover:text-[#1e293b]"
+                        disabled={isLoading}
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -192,6 +253,7 @@ export default function Login() {
                         id="remember"
                         checked={rememberMe}
                         onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                        disabled={isLoading}
                       />
                       <Label htmlFor="remember" className="text-sm text-[#64748b]">
                         Remember me
@@ -208,8 +270,9 @@ export default function Login() {
                   <Button
                     type="submit"
                     className="w-full bg-gradient-to-r from-[#2563eb] to-[#0ea5e9] hover:from-[#1d4ed8] hover:to-[#0284c7] text-white font-medium py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                    disabled={isLoading}
                   >
-                    Sign In
+                    {isLoading ? "Signing in..." : "Sign In"}
                   </Button>
                 </form>
 
@@ -226,6 +289,7 @@ export default function Login() {
                   <Button
                     variant="outline"
                     className="border-[#e2e8f0] hover:bg-[#f9fafb] hover:border-[#2563eb] transition-all duration-300"
+                    disabled={isLoading}
                   >
                     <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                       <path
@@ -250,6 +314,7 @@ export default function Login() {
                   <Button
                     variant="outline"
                     className="border-[#e2e8f0] hover:bg-[#f9fafb] hover:border-[#2563eb] transition-all duration-300"
+                    disabled={isLoading}
                   >
                     <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
