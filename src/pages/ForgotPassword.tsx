@@ -1,19 +1,56 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Mail, ArrowLeft, ShieldCheck, LifeBuoy } from "lucide-react";
+import { Mail, ArrowLeft, ShieldCheck, LifeBuoy, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import emailjs from '@emailjs/browser';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Hook into real password reset flow
-    setSubmitted(true);
+    setLoading(true);
+    setError("");
+
+    try {
+      // Generate a reset token (in production, this should come from your backend)
+      const resetToken = Math.random().toString(36).substring(2, 15);
+      const resetLink = "http://localhost:8080/reset-password";
+
+      // EmailJS configuration
+      const serviceId = 'service_w2vwoup'; // Replace with your EmailJS service ID
+      const templateId = 'template_jv7m08q'; // Replace with your EmailJS template ID
+      const publicKey = 'PAh4Fg2yBcP4iwBry'; // Replace with your EmailJS public key
+
+      // Template parameters
+      const templateParams = {
+        email:email,
+        to_email: email,
+        // reset_link: resetLink,
+        // user_email: email,
+      };
+
+      // Send email using EmailJS
+      await emailjs.send(
+        serviceId,
+        templateId,
+        templateParams,
+        publicKey
+      );
+
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Failed to send email:', err);
+      setError('Failed to send reset email. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -72,15 +109,30 @@ export default function ForgotPassword() {
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-10 border-[#e2e8f0] focus:border-[#2563eb] focus:ring-[#2563eb]"
                       required
+                      disabled={loading}
                     />
                   </div>
                 </div>
 
+                {error && (
+                  <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+                    <p className="text-sm text-red-600">{error}</p>
+                  </div>
+                )}
+
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-[#2563eb] to-[#0ea5e9] hover:from-[#1d4ed8] hover:to-[#0284c7] text-white font-medium py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-[#2563eb] to-[#0ea5e9] hover:from-[#1d4ed8] hover:to-[#0284c7] text-white font-medium py-3 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Send reset link
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    'Send reset link'
+                  )}
                 </Button>
 
                 <div className="flex items-center justify-between text-sm">
@@ -99,5 +151,3 @@ export default function ForgotPassword() {
     </div>
   );
 }
-
-

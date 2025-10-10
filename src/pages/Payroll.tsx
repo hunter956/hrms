@@ -13,23 +13,17 @@ export default function Payroll() {
   return (
     <div className="space-y-6">
       {/* Back Button */}
-      <Button 
-        variant="outline" 
-        className="flex items-center gap-2"
-        onClick={() => navigate(-1)}
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Employee Management
-      </Button>
-
-      <header>
-        <h1 className="text-3xl font-bold text-[#1e293b]">
-          Payroll Management
-        </h1>
-        <p className="text-[#64748b] mt-2">
-          Manage salary structures, calculations, tax deductions, and generate salary slips
-        </p>
-      </header>
+        <div>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" className="flex items-center gap-2 h-8 w-8 p-0" onClick={() => navigate('/employees')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-3xl font-bold tracking-tight text-[#1e293b]">Payroll Management</h1>
+          <p className="text-[#64748b] mt-2">
+            (Manage salary structures, calculations, tax deductions, and generate salary slips)
+          </p>
+        </div>
+      </div>
 
       <Tabs defaultValue="structure" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4 lg:w-auto bg-[#f9fafb] border border-[#e2e8f0]">

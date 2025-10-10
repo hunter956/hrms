@@ -32,20 +32,16 @@ export default function Leaves() {
   return (
     <div className="space-y-6">
       {/* Back Button */}
-      <Button 
-        variant="outline" 
-        className="flex items-center gap-2"
-        onClick={() => navigate('/employees')}
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Employee Management
-      </Button>
-
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-[#1e293b]">Leave Management</h1>
-        <p className="text-[#64748b] mt-2">
-          Manage employee leave types, balances, requests, and holidays
-        </p>
+        <div>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" className="flex items-center gap-2 h-8 w-8 p-0" onClick={() => navigate('/employees')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-3xl font-bold tracking-tight text-[#1e293b]">Leave Management</h1>
+          <p className="text-[#64748b] mt-2">
+            (Manage employee leave types, balances, requests, and holidays)
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -127,16 +123,6 @@ export default function Leaves() {
             </Table>
           </div>
         </CardContent>
-      </Card>
-
-      <Card className="p-6">
-        <Alert>
-          <Calendar className="h-4 w-4" />
-          <AlertTitle>Database Setup Recommended</AlertTitle>
-          <AlertDescription>
-            The live Leave Management feature requires database tables (leave types, balances, requests, holidays). This page currently shows static demo data.
-          </AlertDescription>
-        </Alert>
       </Card>
     </div>
   );
