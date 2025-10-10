@@ -14,7 +14,7 @@ const DEMO_USER = {
   id: "demo-user-123",
   email: "john.doe@company.com",
   name: "John Doe",
-  role: "manager", // Can be: "employee", "manager", "admin"
+  role: "manager", 
 };
 
 export default function Portal() {
@@ -56,7 +56,7 @@ export default function Portal() {
         </p>
       </header>
 
-      <Tabs defaultValue="leave-apply" className="space-y-6">
+      <Tabs defaultValue="profile" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 lg:w-auto">
           <TabsTrigger value="profile">Update Profile</TabsTrigger>
           <TabsTrigger value="payslips">Payslips</TabsTrigger>

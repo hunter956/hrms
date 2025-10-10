@@ -15,20 +15,25 @@ export default function Attendance() {
   return (
     <div className="space-y-6">
       {/* Back Button */}
-      <Button 
+      {/* <Button 
         variant="outline" 
         className="flex items-center gap-2"
         onClick={() => navigate('/employees')}
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Employee Management
-      </Button>
+      </Button> */}
 
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-[#1e293b]">Attendance & Time Tracking</h1>
-        <p className="text-[#64748b] mt-2">
-          Manage employee attendance, shifts, and working hours
-        </p>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" className="flex items-center gap-2 h-8 w-8 p-0" onClick={() => navigate('/employees')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-3xl font-bold tracking-tight text-[#1e293b]">Attendance & Time Tracking</h1>
+          <p className="text-[#64748b] mt-2">
+            (Manage employee attendance, shifts, and working hours)
+          </p>
+        </div>
       </div>
 
       <AttendanceStats />

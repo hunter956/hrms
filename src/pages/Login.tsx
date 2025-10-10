@@ -112,11 +112,12 @@ export default function Login() {
           <div className="space-y-8">
             <div className="space-y-6">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-[#2563eb] to-[#0ea5e9] flex items-center justify-center shadow-xl">
-                  <Building2 className="h-8 w-8 text-white" />
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-r  flex items-center justify-center ">
+                  <img src="https://globtechnoitsolution.com:8443/ec-admin-dev-ui/assets/images/logo.png"
+                  alt="GlobeTecno Logo" className="w-16 h-16 rounded-2xl object-contain"/>
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold text-[#1e293b]">HR Zenith</h1>
+                  <h1 className="text-4xl font-bold text-[#1e293b]">GlobTecnho</h1>
                   <p className="text-[#64748b] text-lg">Human Resource Management System</p>
                 </div>
               </div>
@@ -280,12 +281,12 @@ export default function Login() {
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-[#e2e8f0]"></div>
                   </div>
-                  <div className="relative flex justify-center text-sm">
+                  {/* <div className="relative flex justify-center text-sm">
                     <span className="px-2 bg-white text-[#64748b]">Or continue with</span>
-                  </div>
+                  </div> */}
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                {/* <div className="grid grid-cols-2 gap-3">
                   <Button
                     variant="outline"
                     className="border-[#e2e8f0] hover:bg-[#f9fafb] hover:border-[#2563eb] transition-all duration-300"
@@ -321,7 +322,7 @@ export default function Login() {
                     </svg>
                     Facebook
                   </Button>
-                </div>
+                </div> */}
               </CardContent>
             </Card>
           </div>

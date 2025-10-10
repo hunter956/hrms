@@ -9,6 +9,7 @@ import PrivateRoute from "@/components/PrivateRoute";
 
 import Login from "@/pages/Login";
 import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 import Dashboard from "@/pages/Dashboard";
 import Employees from "@/pages/Employees";
 import AddEmployee from "@/pages/AddEmployee";
@@ -221,6 +222,14 @@ const App = () => (
               </AuthLayout>
             }
           />
+        <Route
+          path="/reset-password"
+          element={
+            <AuthLayout>
+              <ResetPassword />
+            </AuthLayout>
+          }
+        />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

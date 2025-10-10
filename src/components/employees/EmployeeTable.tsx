@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, Edit, Trash2, Eye, Plus } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, Eye, Plus,Filter,Download } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,6 +52,24 @@ const sampleEmployees = [
     status: "Active",
     joinDate: "2022-08-05",
   },
+  {
+    id: "EMP005",
+    name: "Jack Sprrow",
+    email: "jack.sp@company.com",
+    department: "DEV",
+    position: "Developer", 
+    status: "Active",
+    joinDate: "2023-08-05",
+  },
+   {
+    id: "EMP006",
+    name: "Tejas Patil",
+    email: "tejas.tj@company.com",
+    department: "SUP",
+    position: "Support Co-ordinater", 
+    status: "Active",
+    joinDate: "2025-08-05",
+  },
 ];
 
 export const EmployeeTable = () => {
@@ -73,7 +91,8 @@ export const EmployeeTable = () => {
     status: "",
     joinDate: "",
   });
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [departmentFilter, setDepartmentFilter] = useState("");
   const showNotification = (message) => {
     setNotification(message);
     setTimeout(() => setNotification(""), 3000);
@@ -306,7 +325,38 @@ export const EmployeeTable = () => {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-          </div>
+          </div><br />
+          <div className="flex flex-col sm:flex-row gap-4 p-6 rounded-xl ">
+                  <div className="flex-1">
+                    <Input
+                      placeholder="Search employees by name, email, or ID..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="bg-background/90 backdrop-blur-sm border-border/50 focus:border-primary/50 transition-all duration-300"
+                    />
+                  </div>
+                  <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                    <SelectTrigger className="w-full sm:w-[200px] bg-background/90 backdrop-blur-sm border-border/50 focus:border-primary/50 transition-all duration-300">
+                      <SelectValue placeholder="All Departments" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Departments</SelectItem>
+                      <SelectItem value="engineering">Engineering</SelectItem>
+                      <SelectItem value="marketing">Marketing</SelectItem>
+                      <SelectItem value="sales">Sales</SelectItem>
+                      <SelectItem value="hr">HR</SelectItem>
+                      <SelectItem value="finance">Finance</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Filter className="h-4 w-4" />
+                    More Filters
+                  </Button>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Download className="h-4 w-4" />
+                    Export
+                  </Button>
+                </div>
         </CardHeader>
         <CardContent>
           <div className="rounded-xl shadow-lg border border-gray-200 overflow-hidden">

@@ -43,21 +43,53 @@ export default function Profile() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile Picture</CardTitle>
-          </CardHeader>
-          <CardContent className="flex items-center gap-4">
-            <Avatar className="h-20 w-20">
-              <AvatarImage src={avatarUrl} alt={basic.name} />
-              <AvatarFallback>{basic.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-            </Avatar>
-            <div className="space-y-2">
-              <Input type="file" accept="image/*" onChange={(e) => setAvatarFile(e.target.files?.[0])} />
-              <p className="text-xs text-muted-foreground">JPG/PNG, up to 2MB.</p>
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Profile Picture</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center space-y-6 py-8">
+              {/* Large Circular Avatar */}
+              <div className="relative group">
+                <Avatar className="h-32 w-32 ring-4 ring-offset-4 ring-primary/10 transition-all group-hover:ring-primary/20">
+                  <AvatarImage src={avatarUrl} alt={basic.name} className="object-cover" />
+                  <AvatarFallback className="text-3xl font-semibold bg-gradient-to-br from-primary/20 to-primary/10">
+                    {basic.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                {avatarUrl && (
+                  <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <p className="text-white text-sm font-medium">Change Photo</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Upload Section */}
+              <div className="w-full max-w-sm space-y-3">
+                <label 
+                  htmlFor="avatar-upload" 
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg cursor-pointer transition-all font-medium text-white"
+                  style={{ backgroundColor: '#2563eb' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                  Upload New Photo
+                </label>
+                <Input 
+                  id="avatar-upload"
+                  type="file" 
+                  accept="image/*" 
+                  onChange={(e) => setAvatarFile(e.target.files?.[0])} 
+                  className="hidden"
+                />
+                <p className="text-sm text-muted-foreground text-center">
+                  JPG or PNG format, maximum size 2MB
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
         <Card className="lg:col-span-2">
           <CardHeader>

@@ -13,18 +13,16 @@ export default function Exit() {
   return (
     <div className="space-y-6">
       {/* Back Button */}
-      <Button 
-        variant="outline" 
-        className="flex items-center gap-2"
-        onClick={() => navigate(-1)}
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Employee Management
-      </Button>
-
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Separation & Exit Management</h2>
-        <p className="text-muted-foreground">Resignations, interviews, clearances and full & final settlements.</p>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" className="flex items-center gap-2 h-8 w-8 p-0" onClick={() => navigate('/employees')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-3xl font-bold tracking-tight text-[#1e293b]">Separation & Exit Management</h1>
+          <p className="text-[#64748b] mt-2">
+            (Resignations, interviews, clearances and full & final settlements.)
+          </p>
+        </div>
       </div>
 
       <Tabs defaultValue="resignations" className="w-full">
